@@ -21,6 +21,15 @@ Instala la librería necesaria:
 pip install cryptography
 ```
 
+**Información solo para Debian/Ubuntu/Kali WSL:**  
+Si intenta instalar dependencias en cualquier distribución Linux basado en Debian para WSL como cryptography, resultará en un error del sistema, se trata de una política nueva basada en PEP 668, que bloquea a pip para evitar que modifique el Python del sistema. Para lo cuál lo gestionaremos mediante apt:
+
+#### Para Ubuntu/Debian/Kali
+
+```bash
+sudo apt install python3-cryptography
+```
+
 ### Descarga
 
 ```bash
