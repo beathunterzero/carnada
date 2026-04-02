@@ -13,6 +13,8 @@
 
 ### Requisitos
 - Tener instalado **Python 3.8 o superior**
+- pip o entorno virtual
+- cryptography (instalable vía pip o apt)
 
 ### Dependencias
 Instala la librería necesaria:
@@ -21,7 +23,7 @@ Instala la librería necesaria:
 pip install cryptography
 ```
 
-**Información solo para distribuciones Linux basadas en Debian:**  
+⚠️ **Información solo para distribuciones Linux basadas en Debian:**  
 Si intenta instalar dependencias pip en cualquier distribución Linux basado en Debian, resultará en un error del sistema, se trata de una política nueva basada en PEP 668, que bloquea a pip para evitar que modifique el Python del sistema. Para lo cuál lo gestionaremos mediante apt.
 
 #### Para distribuciones Linux basadas en Debian
@@ -53,7 +55,7 @@ Si solo ejecutas el programa, este te preguntará los datos necesarios paso a pa
 python carnada.py
 ```
 
-**Información solo para Debian:**  
+⚠️ **Información solo para Debian:**  
 Trabajaremos con el comando python3 en vez de python, para todas las cadenas generadas, por lo que se recomienda trabajar todos los ejemplos con python3.
 
 #### Para Debian
