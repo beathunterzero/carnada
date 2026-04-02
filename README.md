@@ -53,7 +53,9 @@ Te pedirá un nombre de usuario y una **Clave Maestra**.
   - SHA-256  
   - SHA-512  
   - AES-256  
-  - ChaCha20  
+  - ChaCha20
+ 
+<img width="1122" height="822" alt="image" src="https://github.com/user-attachments/assets/d996b93f-bc26-4f74-b02f-3a0d60c1fa30" />
 
 **Importante:**  
 No guarda nada en archivo, solo se ve en tu terminal.
@@ -75,6 +77,10 @@ Genera la contraseña y crea (o actualiza) un archivo llamado:
 contrasenas_generadas.txt
 ```
 
+<img width="1139" height="819" alt="image" src="https://github.com/user-attachments/assets/86d3482e-1248-4662-9bd2-863655ccc4b9" />
+
+<img width="907" height="441" alt="image" src="https://github.com/user-attachments/assets/67f628fe-cc6f-4d29-91bd-746e200f580f" />
+
 **Importante:**  
 El parámetro `-s` o `--save` es lo que activa el guardado.  
 Si no lo pones, solo verás los datos en consola.
@@ -92,9 +98,41 @@ python carnada.py -u admin --cipher chacha
 **¿Qué hace?**  
 Limpia la pantalla para mostrarte únicamente el resultado en **ChaCha20-Poly1305**.
 
+<img width="1129" height="512" alt="image" src="https://github.com/user-attachments/assets/469ae9cd-c45d-4ccb-aeba-6267d22f645a" />
+
 **Opciones:**  
 - `--cipher aes`  
 - `--cipher chacha`  
+
+---
+
+### 4. Definir una longitud personalizada (`--length`)
+
+Si necesitas una contraseña más corta o mucho más larga que el estándar (18 caracteres):
+
+```bash
+python carnada.py -u mi_usuario --length 32
+```
+
+**¿Qué hace?**  
+Genera una cadena de alta entropía con el tamaño exacto que indiques (ej. 32 caracteres)
+
+<img width="1157" height="800" alt="image" src="https://github.com/user-attachments/assets/387dd0ea-eca0-42bd-85f2-9b8f6f9cc6b7" />
+
+---
+
+### 5. Generar claves sin símbolos (--no-symbols)
+
+Ideal para sistemas antiguos o bases de datos que no aceptan caracteres especiales:
+
+```bash
+python carnada.py -u servicio_legacy --no-symbols
+```
+
+**¿Qué hace?**  
+Filtra el generador para usar únicamente letras (mayúsculas/minúsculas) y números, manteniendo una alta entropía.
+
+<img width="1200" height="792" alt="image" src="https://github.com/user-attachments/assets/0d205e54-fcbd-4ad1-8636-b6cd9278954d" />
 
 ---
 
