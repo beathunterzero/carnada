@@ -133,18 +133,34 @@ python carnada.py -u servicio_legacy --no-symbols
 Filtra el generador para usar únicamente letras (mayúsculas/minúsculas) y números, manteniendo una alta entropía.
 
 <img width="1200" height="792" alt="image" src="https://github.com/user-attachments/assets/0d205e54-fcbd-4ad1-8636-b6cd9278954d" />
+---
+
+### 6. Generar un ejemplo usando las opciones disponibles
+
+Esto es un ejemplo completo de cómo usar las opciones disponibles en unas sola cadena:
+
+```bash
+python carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
+```
+
+**¿Qué hace?**  
+Se esta construyendo una cadena donde pedimos un usuario específico, el tamaño exacto, el formato de cifrado, que no tenga símbolos y que nos guarde en el txt en cuestión.
+
+<img width="1382" height="518" alt="image" src="https://github.com/user-attachments/assets/c3e8dc36-0901-49ef-93a8-af54ba44e600" />
+
+<img width="848" height="263" alt="image" src="https://github.com/user-attachments/assets/0b754e7c-63d5-4c90-bc02-61f85ce29c38" />
 
 ---
 
 ## 📖 Explicación de los Comandos
 
-| Comando | Para qué sirve |
-|--------|---------------|
-| `-u` o `--user` | Indica el nombre de la cuenta (ej. Facebook, Admin, SSH) |
-| `-l` o `--length` | Define qué tan larga será la contraseña (ej. `-l 20`) |
-| `--save` | Guarda todo en `contrasenas_generadas.txt` |
-| `--cipher` | Elige qué algoritmo mostrar (`aes` o `chacha`) |
-| `--no-symbols` | Genera una clave sin símbolos (solo letras y números) |
+| Opción              | Versión corta | Descripción |
+|---------------------|---------------|-----------|
+| `--user`            | `-u`          | Nombre de la cuenta o servicio (ej. Facebook, Admin, SSH) |
+| `--length`          | `-l`          | Longitud de la contraseña (por defecto 18). Ejemplo: `-l 32` |
+| `--save`            | `-s`          | Guarda la contraseña y sus hashes/cifrados en `contrasenas_generadas.txt` |
+| `--cipher`          | —             | Muestra solo un cifrado específico. Opciones: `aes` o `chacha` |
+| `--no-symbols`      | —             | Genera contraseña solo con letras y números (sin símbolos) |
 
 ---
 
