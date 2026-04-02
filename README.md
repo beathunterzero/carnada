@@ -137,14 +137,14 @@ Filtra el generador para usar únicamente letras (mayúsculas/minúsculas) y nú
 
 ### 6. Generar un ejemplo usando las opciones disponibles
 
-Esto es un ejemplo completo de cómo usar las opciones disponibles en unas sola cadena:
+Esto es un ejemplo completo de cómo usar las opciones disponibles en una sola cadena:
 
 ```bash
 python carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
 ```
 
 **¿Qué hace?**  
-Se esta construyendo una cadena donde pedimos un usuario específico, el tamaño exacto, el formato de cifrado, que no tenga símbolos y que nos guarde en el txt en cuestión.
+Se está construyendo una cadena donde pedimos un usuario específico, el tamaño exacto, el formato de cifrado, que no tenga símbolos y que nos guarde en el txt en cuestión.
 
 <img width="1382" height="518" alt="image" src="https://github.com/user-attachments/assets/c3e8dc36-0901-49ef-93a8-af54ba44e600" />
 
