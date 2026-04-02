@@ -24,7 +24,7 @@ pip install cryptography
 ### Descarga
 
 ```bash
-git clone https://github.com/tu-usuario/carnada.git
+git clone https://github.com/beathunterzero/carnada.git
 cd carnada
 ```
 
