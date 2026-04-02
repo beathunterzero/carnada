@@ -22,7 +22,7 @@ pip install cryptography
 ```
 
 **Información solo para Debian/Ubuntu/Kali WSL:**  
-Si intenta instalar dependencias en cualquier distribución Linux basado en Debian para WSL como cryptography, resultará en un error del sistema, se trata de una política nueva basada en PEP 668, que bloquea a pip para evitar que modifique el Python del sistema. Para lo cuál lo gestionaremos mediante apt:
+Si intenta instalar dependencias en cualquier distribución Linux basado en Debian para WSL como cryptography, resultará en un error del sistema, se trata de una política nueva basada en PEP 668, que bloquea a pip para evitar que modifique el Python del sistema. Para lo cuál lo gestionaremos mediante apt.
 
 #### Para Ubuntu/Debian/Kali en WSL
 
@@ -51,6 +51,15 @@ Si solo ejecutas el programa, este te preguntará los datos necesarios paso a pa
 
 ```bash
 python carnada.py
+```
+
+**Información solo para Debian WSL:**  
+Trabajaremos con el comando python3 en vez de python, para todas las cadenas generadas, por lo que se recomienda trabajar todos los ejemplos con python3.
+
+#### Para Debian en WSL
+
+```bash
+python3 carnada.py
 ```
 
 **¿Qué hace?**  
