@@ -87,6 +87,11 @@ Si quieres que la información se guarde para consultarla después:
 ```bash
 python carnada.py -u mi_usuario --save
 ```
+#### Para Debian en WSL
+
+```bash
+python3 carnada.py -u mi_usuario --save
+```
 
 **¿Qué hace?**  
 Genera la contraseña y crea (o actualiza) un archivo llamado:
@@ -113,6 +118,12 @@ Si solo necesitas un formato específico en pantalla para copiarlo rápido:
 python carnada.py -u admin --cipher chacha
 ```
 
+#### Para Debian en WSL
+
+```bash
+python3 carnada.py -u admin --cipher chacha
+```
+
 **¿Qué hace?**  
 Limpia la pantalla para mostrarte únicamente el resultado en **ChaCha20-Poly1305**.
 
@@ -132,6 +143,12 @@ Si necesitas una contraseña más corta o mucho más larga que el estándar (18 
 python carnada.py -u mi_usuario --length 32
 ```
 
+#### Para Debian en WSL
+
+```bash
+python3 carnada.py -u mi_usuario --length 32
+```
+
 **¿Qué hace?**  
 Genera una cadena de alta entropía con el tamaño exacto que indiques (ej. 32 caracteres)
 
@@ -147,6 +164,12 @@ Ideal para sistemas antiguos o bases de datos que no aceptan caracteres especial
 python carnada.py -u servicio_legacy --no-symbols
 ```
 
+#### Para Debian en WSL
+
+```bash
+python3 carnada.py -u servicio_legacy --no-symbols
+```
+
 **¿Qué hace?**  
 Filtra el generador para usar únicamente letras (mayúsculas/minúsculas) y números, manteniendo una alta entropía.
 
@@ -159,6 +182,12 @@ Esto es un ejemplo completo de cómo usar las opciones disponibles en una sola c
 
 ```bash
 python carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
+```
+
+#### Para Debian en WSL
+
+```bash
+python3 carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
 ```
 
 **¿Qué hace?**  
