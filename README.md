@@ -21,10 +21,10 @@ Instala la librería necesaria:
 pip install cryptography
 ```
 
-**Información solo para Debian/Ubuntu/Kali WSL:**  
-Si intenta instalar dependencias en cualquier distribución Linux basado en Debian para WSL como cryptography, resultará en un error del sistema, se trata de una política nueva basada en PEP 668, que bloquea a pip para evitar que modifique el Python del sistema. Para lo cuál lo gestionaremos mediante apt.
+**Información solo para distribuciones Linux basadas en Debian:**  
+Si intenta instalar dependencias pip en cualquier distribución Linux basado en Debian, resultará en un error del sistema, se trata de una política nueva basada en PEP 668, que bloquea a pip para evitar que modifique el Python del sistema. Para lo cuál lo gestionaremos mediante apt.
 
-#### Para Ubuntu/Debian/Kali en WSL
+#### Para distribuciones Linux basadas en Debian
 
 ```bash
 sudo apt install python3-cryptography
@@ -53,10 +53,10 @@ Si solo ejecutas el programa, este te preguntará los datos necesarios paso a pa
 python carnada.py
 ```
 
-**Información solo para Debian WSL:**  
+**Información solo para Debian:**  
 Trabajaremos con el comando python3 en vez de python, para todas las cadenas generadas, por lo que se recomienda trabajar todos los ejemplos con python3.
 
-#### Para Debian en WSL
+#### Para Debian
 
 ```bash
 python3 carnada.py
@@ -87,7 +87,7 @@ Si quieres que la información se guarde para consultarla después:
 ```bash
 python carnada.py -u mi_usuario --save
 ```
-#### Para Debian en WSL
+#### Para Debian
 
 ```bash
 python3 carnada.py -u mi_usuario --save
@@ -118,7 +118,7 @@ Si solo necesitas un formato específico en pantalla para copiarlo rápido:
 python carnada.py -u admin --cipher chacha
 ```
 
-#### Para Debian en WSL
+#### Para Debian
 
 ```bash
 python3 carnada.py -u admin --cipher chacha
@@ -143,7 +143,7 @@ Si necesitas una contraseña más corta o mucho más larga que el estándar (18 
 python carnada.py -u mi_usuario --length 32
 ```
 
-#### Para Debian en WSL
+#### Para Debian
 
 ```bash
 python3 carnada.py -u mi_usuario --length 32
@@ -164,7 +164,7 @@ Ideal para sistemas antiguos o bases de datos que no aceptan caracteres especial
 python carnada.py -u servicio_legacy --no-symbols
 ```
 
-#### Para Debian en WSL
+#### Para Debian
 
 ```bash
 python3 carnada.py -u servicio_legacy --no-symbols
@@ -184,7 +184,7 @@ Esto es un ejemplo completo de cómo usar las opciones disponibles en una sola c
 python carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
 ```
 
-#### Para Debian en WSL
+#### Para Debian
 
 ```bash
 python3 carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
