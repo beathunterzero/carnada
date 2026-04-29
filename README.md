@@ -363,29 +363,6 @@ The initial version keeps the scope intentionally small and avoids features that
 
 ---
 
-# Roadmap
-
-Features considered for future versions:
-
-- clipboard copy option;
-    
-- additional generation profiles;
-    
-- local word-based passphrase mode;
-    
-- installation as a real `carnada` command;
-    
-- `pyproject.toml`;
-    
-- automated tests;
-    
-- more advanced password policy validation;
-    
-- GitHub Actions for linting and testing.
-    
-
----
-
 # License
 
 This project is distributed under the license specified in the `LICENSE` file.
