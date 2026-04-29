@@ -107,7 +107,7 @@ Its purpose is to provide a small, auditable, and easy-to-use tool to:
 - guarantee absolute security.
     
 
-This is intentional. The tool is designed to do a few things clearly, locally, and audibly.
+This is intentional. The tool is designed to do a few things clearly, locally, and auditably.
 
 ---
 
@@ -127,7 +127,7 @@ This is intentional. The tool is designed to do a few things clearly, locally, a
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-user/carnada.git
+git clone https://github.com/beathunterzero/carnada.git
 cd carnada
 ```
 
