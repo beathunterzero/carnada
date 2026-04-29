@@ -2,237 +2,399 @@
 
 ![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Security: AES-256-GCM](https://img.shields.io/badge/Security-AES--256--GCM-green.svg)
-![Security: ChaCha20-Poly1305](https://img.shields.io/badge/Security-ChaCha20--Poly1305-orange.svg)
 
-**Carnada** es una herramienta profesional para generar contraseñas seguras. No solo crea claves difíciles de adivinar, sino que también las protege usando tecnología de cifrado avanzada (la misma que usan los bancos y las VPNs).
+# CARNADA
+
+`carnada` is a local CLI tool for generating secure passwords and checking existing passwords from the terminal.
+
+The project follows a simple principle: generate strong credentials without storing secrets, sending data to the internet, or adding unnecessary features that increase operational risk.
 
 ---
 
-## 🚀 Instalación
+# Description
 
-### Requisitos
-- Tener instalado **Python 3.8 o superior**
-- pip o entorno virtual
-- cryptography (instalable vía pip o apt)
+`carnada` generates random passwords using cryptographically secure mechanisms provided by Python. It also includes a local password analysis mode to inspect basic characteristics such as length, uppercase letters, lowercase letters, numbers, symbols, ambiguous characters, and approximate entropy.
 
-### Dependencias
-Instala la librería necesaria:
+The tool is designed for local usage, cybersecurity labs, temporary credential generation, technical testing, and shell-based workflows.
+
+---
+
+# Project Goal
+
+`carnada` is not intended to replace a password manager.
+
+Its purpose is to provide a small, auditable, and easy-to-use tool to:
+
+- generate secure passwords from the terminal;
+    
+- create passwords compatible with different environments;
+    
+- check passwords locally;
+    
+- integrate with scripts using clean or JSON output;
+    
+- keep the operational risk surface small.
+    
+
+---
+
+# Main Features
+
+- Secure password generation using cryptographically secure randomness.
+    
+- Generation profiles for different use cases.
+    
+- Approximate entropy estimation in bits.
+    
+- Local password checking.
+    
+- Multiple password generation in a single execution.
+    
+- Quiet mode for scripting.
+    
+- JSON output for automation.
+    
+- No password storage.
+    
+- No internet connection required.
+    
+- No encryption vault, secret management, or remote synchronization.
+    
+
+---
+
+# What It Does
+
+`carnada` can:
+
+- generate a secure password using the default configuration;
+    
+- generate passwords with a custom length;
+    
+- generate multiple passwords;
+    
+- use profiles such as `strong`, `legacy`, `pin`, `hex`, and `wifi`;
+    
+- display an approximate entropy estimate;
+    
+- classify the approximate password strength;
+    
+- check a password entered by the user;
+    
+- return normal, quiet, or JSON output.
+    
+
+---
+
+# What It Does Not Do
+
+`carnada` does not:
+
+- store passwords;
+    
+- manage password vaults;
+    
+- encrypt files;
+    
+- generate password hashes;
+    
+- synchronize secrets;
+    
+- send information to the internet;
+    
+- replace a password manager;
+    
+- guarantee absolute security.
+    
+
+This is intentional. The tool is designed to do a few things clearly, locally, and audibly.
+
+---
+
+# Requirements
+
+- Python 3.10 or higher.
+    
+- No external dependencies required.
+    
+- Uses only the Python standard library.
+    
+
+---
+
+# Installation and Quick Start
+
+Clone the repository:
 
 ```bash
-pip install cryptography
-```
-
-⚠️ **Información solo para distribuciones Linux basadas en Debian:**  
-Si intenta instalar dependencias pip en cualquier distribución Linux basado en Debian, resultará en un error del sistema, se trata de una política nueva basada en PEP 668, que bloquea a pip para evitar que modifique el Python del sistema. Para lo cuál lo gestionaremos mediante apt.
-
-#### Para distribuciones Linux basadas en Debian
-
-```bash
-sudo apt install python3-cryptography
-```
-
-### Descarga
-
-```bash
-git clone https://github.com/beathunterzero/carnada.git
+git clone https://github.com/your-user/carnada.git
 cd carnada
 ```
 
----
-
-## 🛠️ Guía de Uso Rápido (Manual)
-
-El uso de **Carnada** es muy sencillo. Aquí tienes los escenarios más comunes:
-
----
-
-### 1. El modo más simple (Interactivo)
-
-Si solo ejecutas el programa, este te preguntará los datos necesarios paso a paso.
-
-```bash
-python carnada.py
-```
-
-⚠️ **Información solo para Debian:**  
-Trabajaremos con el comando python3 en vez de python, para todas las cadenas generadas, por lo que se recomienda trabajar todos los ejemplos con python3.
-
-#### Para Debian
+Run the tool:
 
 ```bash
 python3 carnada.py
 ```
 
-**¿Qué hace?**  
-Te pedirá un nombre de usuario y una **Clave Maestra**.
+Optional direct execution on Linux, WSL, or macOS:
 
-**Resultado:**  
-- Genera una contraseña  
-- Muestra en pantalla:
-  - SHA-256  
-  - SHA-512  
-  - AES-256  
-  - ChaCha20
- 
-<img width="1122" height="822" alt="image" src="https://github.com/user-attachments/assets/d996b93f-bc26-4f74-b02f-3a0d60c1fa30" />
+```bash
+chmod +x carnada.py
+./carnada.py
+```
 
-**Importante:**  
-No guarda nada en archivo, solo se ve en tu terminal.
+On Windows PowerShell:
+
+```powershell
+python carnada.py
+```
+
+Because the tool has no external dependencies, no package installation is required.
 
 ---
 
-### 2. Guardar los resultados en un archivo (`--save`)
+# Basic Usage
 
-Si quieres que la información se guarde para consultarla después:
-
-```bash
-python carnada.py -u mi_usuario --save
-```
-#### Para Debian
+Generate a secure password using the default configuration:
 
 ```bash
-python3 carnada.py -u mi_usuario --save
+python3 carnada.py
 ```
 
-**¿Qué hace?**  
-Genera la contraseña y crea (o actualiza) un archivo llamado:
+Generate a 24-character password:
 
+```bash
+python3 carnada.py -l 24
 ```
-contrasenas_generadas.txt
+
+Generate a password using the `legacy` profile:
+
+```bash
+python3 carnada.py --profile legacy
 ```
 
-<img width="1139" height="819" alt="image" src="https://github.com/user-attachments/assets/86d3482e-1248-4662-9bd2-863655ccc4b9" />
+Generate five passwords:
 
-<img width="907" height="441" alt="image" src="https://github.com/user-attachments/assets/67f628fe-cc6f-4d29-91bd-746e200f580f" />
+```bash
+python3 carnada.py --count 5
+```
 
-**Importante:**  
-El parámetro `-s` o `--save` es lo que activa el guardado.  
-Si no lo pones, solo verás los datos en consola.
+Print only the generated password:
+
+```bash
+python3 carnada.py --quiet
+```
+
+Generate JSON output:
+
+```bash
+python3 carnada.py --json
+```
+
+Check a password locally:
+
+```bash
+python3 carnada.py check
+```
+
+Check a password directly from the command line:
+
+```bash
+python3 carnada.py check "Password123!"
+```
 
 ---
 
-### 3. Ver solo un tipo de cifrado (`--cipher`)
+# Available Profiles
 
-Si solo necesitas un formato específico en pantalla para copiarlo rápido:
+## `strong`
 
-```bash
-python carnada.py -u admin --cipher chacha
-```
+Recommended profile for general use. Uses uppercase letters, lowercase letters, numbers, and symbols. Designed to generate strong passwords for modern systems.
 
-#### Para Debian
+## `legacy`
 
-```bash
-python3 carnada.py -u admin --cipher chacha
-```
+Compatible profile for older or restrictive systems. Uses letters and numbers while avoiding complex symbols.
 
-**¿Qué hace?**  
-Limpia la pantalla para mostrarte únicamente el resultado en **ChaCha20-Poly1305**.
+## `pin`
 
-<img width="1129" height="512" alt="image" src="https://github.com/user-attachments/assets/469ae9cd-c45d-4ccb-aeba-6267d22f645a" />
+Numeric profile. Useful for short temporary PINs or numeric codes.
 
-**Opciones:**  
-- `--cipher aes`  
-- `--cipher chacha`  
+## `hex`
 
----
+Hexadecimal token profile. Useful for technical testing, labs, or workflows that require hexadecimal output.
 
-### 4. Definir una longitud personalizada (`--length`)
+## `wifi`
 
-Si necesitas una contraseña más corta o mucho más larga que el estándar (18 caracteres):
-
-```bash
-python carnada.py -u mi_usuario --length 32
-```
-
-#### Para Debian
-
-```bash
-python3 carnada.py -u mi_usuario --length 32
-```
-
-**¿Qué hace?**  
-Genera una cadena de alta entropía con el tamaño exacto que indiques (ej. 32 caracteres)
-
-<img width="1157" height="800" alt="image" src="https://github.com/user-attachments/assets/387dd0ea-eca0-42bd-85f2-9b8f6f9cc6b7" />
+Profile for long and compatible Wi-Fi passwords. Avoids complex symbols to make manual entry easier on devices.
 
 ---
 
-### 5. Generar claves sin símbolos (--no-symbols)
+# Output Examples
 
-Ideal para sistemas antiguos o bases de datos que no aceptan caracteres especiales:
+Normal generation example:
 
-```bash
-python carnada.py -u servicio_legacy --no-symbols
+```text
+CARNADA — Secure Password Generator
+------------------------------------------
+Password : V7#kQm92@tLx8pRz
+Profile  : strong
+Length   : 18
+Charset  : 82 characters
+Entropy  : ~114.44 bits
+Rating   : very strong
 ```
 
-#### Para Debian
+Quiet mode example:
 
-```bash
-python3 carnada.py -u servicio_legacy --no-symbols
+```text
+V7#kQm92@tLx8pRz
 ```
 
-**¿Qué hace?**  
-Filtra el generador para usar únicamente letras (mayúsculas/minúsculas) y números, manteniendo una alta entropía.
+Password check example:
 
-<img width="1200" height="792" alt="image" src="https://github.com/user-attachments/assets/0d205e54-fcbd-4ad1-8636-b6cd9278954d" />
----
-
-### 6. Generar un ejemplo usando las opciones disponibles
-
-Esto es un ejemplo completo de cómo usar las opciones disponibles en una sola cadena:
-
-```bash
-python carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
+```text
+CARNADA — Password Check
+------------------------------------------
+Length          : 12
+Uppercase       : yes
+Lowercase       : yes
+Numbers         : yes
+Symbols         : yes
+Ambiguous chars : yes
+Entropy         : ~78.66 bits
+Rating          : strong
 ```
-
-#### Para Debian
-
-```bash
-python3 carnada.py -u Netflix -l 24 --cipher chacha --no-symbols -s
-```
-
-**¿Qué hace?**  
-Se está construyendo una cadena donde pedimos un usuario específico, el tamaño exacto, el formato de cifrado, que no tenga símbolos y que nos guarde en el txt en cuestión.
-
-<img width="1382" height="518" alt="image" src="https://github.com/user-attachments/assets/c3e8dc36-0901-49ef-93a8-af54ba44e600" />
-
-<img width="848" height="263" alt="image" src="https://github.com/user-attachments/assets/0b754e7c-63d5-4c90-bc02-61f85ce29c38" />
 
 ---
 
-## 📖 Explicación de los Comandos
+# Security and Design
 
-| Opción              | Versión corta | Descripción |
-|---------------------|---------------|-----------|
-| `--user`            | `-u`          | Nombre de la cuenta o servicio (ej. Facebook, Admin, SSH) |
-| `--length`          | `-l`          | Longitud de la contraseña (por defecto 18). Ejemplo: `-l 32` |
-| `--save`            | `-s`          | Guarda la contraseña y sus hashes/cifrados en `contrasenas_generadas.txt` |
-| `--cipher`          | —             | Muestra solo un cifrado específico. Opciones: `aes` o `chacha` |
-| `--no-symbols`      | —             | Genera contraseña solo con letras y números (sin símbolos) |
+`carnada` follows a local-first design.
 
----
+All operations are performed locally on the user’s machine. The tool does not send passwords to external services, does not perform remote requests, and does not require an internet connection.
 
-## 🔐 ¿Qué algoritmos utiliza Carnada?
+Password generation uses Python’s `secrets` module, which is suitable for generating cryptographically secure random values.
 
-Para que tu información sea impenetrable, el programa trabaja con cuatro estándares de la industria:
-
-- **SHA-256 / SHA-512**  
-  Crean una "huella digital" única de tu contraseña (Hashing).
-
-- **AES-256-GCM**  
-  El estándar de cifrado más utilizado en el mundo (Gobiernos y Militares).
-
-- **ChaCha20-Poly1305**  
-  Un cifrado moderno, extremadamente rápido y seguro, ideal para dispositivos móviles.
+The tool avoids storing secrets by design. It does not create files containing passwords, does not store master keys, and does not maintain its own history.
 
 ---
 
-## ⚠️ Recordatorio Importante
+# About Entropy
 
-La **Clave Maestra** que el programa te pide al inicio es la "llave" para tus contraseñas.
+The entropy shown by `carnada` is an approximate estimate based on password length and the size of the character set used.
 
-- Si guardas tus contraseñas con `--save`, necesitarás esa misma clave para descifrarlas en el futuro.  
-- **¡No la pierdas!**
+This metric provides a general reference for the strength of randomly generated passwords, but it should not be interpreted as an absolute security guarantee.
 
-**Desarrollado por beathunterzero** *Entusiasta de la Caza de Amenazas*
+Real-world security also depends on usage context, system policy, secret exposure, storage practices, password reuse, and additional security controls.
+
+---
+
+# Important Considerations
+
+- Do not reuse passwords across different services.
+    
+- Do not paste sensitive passwords into untrusted systems.
+    
+- Do not share passwords through insecure channels.
+    
+- Use a password manager to store permanent credentials.
+    
+- Use `carnada` as a local generator or support tool, not as a secret vault.
+    
+
+---
+
+# Project Structure
+
+```text
+CARNADA/
+├── carnada.py
+├── README.md
+├── LICENSE
+├── .gitignore
+├── docs/
+│   ├── usage.md
+│   ├── security-notes.md
+│   └── architecture/
+│       ├── overview.md
+│       └── carnada-architecture.png
+└── examples/
+    └── usage-examples.md
+```
+
+---
+
+# Additional Documentation
+
+Extended documentation is available in the `docs/` directory.
+
+Usage guide:
+
+```text
+docs/usage.md
+```
+
+Security notes:
+
+```text
+docs/security-notes.md
+```
+
+Architecture overview:
+
+```text
+docs/architecture/overview.md
+```
+
+Practical examples:
+
+```text
+examples/usage-examples.md
+```
+
+---
+
+# Project Status
+
+This project is intended as a personal command-line tool with an educational, practical, and defensive cybersecurity focus.
+
+The initial version keeps the scope intentionally small and avoids features that would unnecessarily increase risk, such as secret storage, vault encryption, or remote synchronization.
+
+---
+
+# Roadmap
+
+Features considered for future versions:
+
+- clipboard copy option;
+    
+- additional generation profiles;
+    
+- local word-based passphrase mode;
+    
+- installation as a real `carnada` command;
+    
+- `pyproject.toml`;
+    
+- automated tests;
+    
+- more advanced password policy validation;
+    
+- GitHub Actions for linting and testing.
+    
+
+---
+
+# License
+
+This project is distributed under the license specified in the `LICENSE` file.
+
+---
+
+# Author
+
+**beathunterzero**  
+Cyber Threat Hunting & Security
+
+Personal project focused on cybersecurity, automation, and defensive command-line tooling.
