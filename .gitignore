@@ -1,2 +1,5 @@
 .venv/
-PYTHON_ENV_SETUP.txt
+__pycache__/
+*.pyc
+.env
+.DS_Store

@@ -1,327 +1,519 @@
+#!/usr/bin/env python3
 """
-carnada - Generador profesional de contraseñas seguras con hashing y cifrado.
+carnada - Local-first CLI password generator and password checker.
+
+Genera contraseñas seguras usando aleatoriedad criptográfica.
+No guarda secretos, no cifra archivos y no envía datos a internet.
 """
 
+from __future__ import annotations
+
 import argparse
-import hashlib
+import json
+import math
 import secrets
 import string
 import sys
-from datetime import datetime
+from dataclasses import dataclass
 from getpass import getpass
 
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM, ChaCha20Poly1305
-from cryptography.hazmat.backends import default_backend
-import base64
-import os
 
-# ===================================================================
-# CONFIGURACIÓN
-# ===================================================================
+APP_NAME = "carnada"
+APP_VERSION = "1.0.0"
 
-CARACTERES_SEGUROS = (
-    string.ascii_uppercase.replace('O', '').replace('I', '') +
-    string.ascii_lowercase.replace('l', '').replace('o', '') +
-    string.digits.replace('0', '').replace('1', '') +
-    "!@#$%^&*()-_=+[]{};:,.<>/?"
-)
-
+MIN_LENGTH = 8
 DEFAULT_LENGTH = 18
-KDF_ITERATIONS = 100_000
-SALT_SIZE = 16
-NONCE_SIZE = 12  # recomendado para AESGCM y ChaCha20Poly1305
 
-# ===================================================================
-# GENERACIÓN DE CONTRASEÑAS Y HASHES
-# ===================================================================
+UPPERCASE = string.ascii_uppercase
+LOWERCASE = string.ascii_lowercase
+NUMBERS = string.digits
+SYMBOLS = "!@#$%^&*()-_=+[]{};:,.<>/?"
 
-def generar_contrasena(longitud: int, incluir_mayus: bool, incluir_minus: bool,
-                       incluir_numeros: bool, incluir_simbolos: bool) -> str:
-    if longitud < 8:
-        longitud = 8
-
-    chars = ""
-    if incluir_mayus:
-        chars += string.ascii_uppercase.replace('O', '').replace('I', '')
-    if incluir_minus:
-        chars += string.ascii_lowercase.replace('l', '').replace('o', '')
-    if incluir_numeros:
-        chars += string.digits.replace('0', '').replace('1', '')
-    if incluir_simbolos:
-        chars += "!@#$%^&*()-_=+[]{};:,.<>/?"
-
-    if not chars:
-        chars = CARACTERES_SEGUROS
-
-    return ''.join(secrets.choice(chars) for _ in range(longitud))
+AMBIGUOUS_CHARS = set("O0I1lo")
 
 
-def generar_hash_sha256(texto: str) -> str:
-    return hashlib.sha256(texto.encode('utf-8')).hexdigest()
+@dataclass(frozen=True)
+class Profile:
+    name: str
+    description: str
+    length: int
+    use_upper: bool
+    use_lower: bool
+    use_numbers: bool
+    use_symbols: bool
+    allow_ambiguous: bool = False
 
 
-def generar_hash_sha512(texto: str) -> str:
-    return hashlib.sha512(texto.encode('utf-8')).hexdigest()
-
-# ===================================================================
-# KDF Y CIFRADO
-# ===================================================================
-
-def derivar_clave_desde_passphrase(passphrase: str, salt: bytes) -> bytes:
-    """
-    Deriva una clave de 32 bytes (256 bits) desde una passphrase usando PBKDF2-HMAC-SHA256.
-    """
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
+PROFILES: dict[str, Profile] = {
+    "strong": Profile(
+        name="strong",
+        description="Uso general con letras, números y símbolos.",
+        length=18,
+        use_upper=True,
+        use_lower=True,
+        use_numbers=True,
+        use_symbols=True,
+    ),
+    "legacy": Profile(
+        name="legacy",
+        description="Compatible con sistemas antiguos: letras y números.",
+        length=16,
+        use_upper=True,
+        use_lower=True,
+        use_numbers=True,
+        use_symbols=False,
+    ),
+    "pin": Profile(
+        name="pin",
+        description="PIN numérico.",
+        length=6,
+        use_upper=False,
+        use_lower=False,
+        use_numbers=True,
+        use_symbols=False,
+        allow_ambiguous=True,
+    ),
+    "hex": Profile(
+        name="hex",
+        description="Token hexadecimal.",
         length=32,
-        salt=salt,
-        iterations=KDF_ITERATIONS,
-        backend=default_backend()
-    )
-    return kdf.derive(passphrase.encode('utf-8'))
+        use_upper=False,
+        use_lower=False,
+        use_numbers=True,
+        use_symbols=False,
+        allow_ambiguous=True,
+    ),
+    "wifi": Profile(
+        name="wifi",
+        description="Contraseña larga y compatible para redes Wi-Fi.",
+        length=24,
+        use_upper=True,
+        use_lower=True,
+        use_numbers=True,
+        use_symbols=False,
+    ),
+}
 
 
-def cifrar_con_aes256(plaintext: str, key: bytes, salt: bytes) -> dict:
-    aesgcm = AESGCM(key)
-    nonce = os.urandom(NONCE_SIZE)
-    ciphertext = aesgcm.encrypt(nonce, plaintext.encode('utf-8'), None)
+def remove_ambiguous(chars: str) -> str:
+    """Elimina caracteres visualmente ambiguos."""
+    return "".join(char for char in chars if char not in AMBIGUOUS_CHARS)
+
+
+def get_charset_groups(
+    use_upper: bool,
+    use_lower: bool,
+    use_numbers: bool,
+    use_symbols: bool,
+    allow_ambiguous: bool,
+    profile_name: str | None = None,
+) -> list[str]:
+    """Construye los grupos de caracteres activos."""
+
+    if profile_name == "hex":
+        return ["0123456789abcdef"]
+
+    groups: list[str] = []
+
+    if use_upper:
+        groups.append(UPPERCASE if allow_ambiguous else remove_ambiguous(UPPERCASE))
+
+    if use_lower:
+        groups.append(LOWERCASE if allow_ambiguous else remove_ambiguous(LOWERCASE))
+
+    if use_numbers:
+        groups.append(NUMBERS if allow_ambiguous else remove_ambiguous(NUMBERS))
+
+    if use_symbols:
+        groups.append(SYMBOLS)
+
+    return [group for group in groups if group]
+
+
+def calculate_entropy(length: int, charset_size: int) -> float:
+    """Calcula entropía aproximada en bits."""
+    if length <= 0 or charset_size <= 1:
+        return 0.0
+
+    return length * math.log2(charset_size)
+
+
+def rate_entropy(entropy_bits: float) -> str:
+    """Clasifica la fortaleza según entropía aproximada."""
+    if entropy_bits < 40:
+        return "weak"
+    if entropy_bits < 70:
+        return "moderate"
+    if entropy_bits < 100:
+        return "strong"
+
+    return "very strong"
+
+
+def generate_password(
+    length: int,
+    groups: list[str],
+) -> str:
+    """
+    Genera una contraseña garantizando al menos un carácter
+    de cada grupo activo.
+    """
+    if not groups:
+        raise ValueError("Debe existir al menos un grupo de caracteres activo.")
+
+    if length < MIN_LENGTH:
+        length = MIN_LENGTH
+
+    if length < len(groups):
+        raise ValueError(
+            f"La longitud mínima para los grupos seleccionados es {len(groups)}."
+        )
+
+    all_chars = "".join(groups)
+
+    password_chars = [secrets.choice(group) for group in groups]
+
+    remaining_length = length - len(password_chars)
+    password_chars.extend(secrets.choice(all_chars) for _ in range(remaining_length))
+
+    secrets.SystemRandom().shuffle(password_chars)
+
+    return "".join(password_chars)
+
+
+def analyze_password(password: str) -> dict[str, object]:
+    """Evalúa una contraseña localmente."""
+    length = len(password)
+
+    has_upper = any(char.isupper() for char in password)
+    has_lower = any(char.islower() for char in password)
+    has_number = any(char.isdigit() for char in password)
+    has_symbol = any(char in SYMBOLS for char in password)
+    has_ambiguous = any(char in AMBIGUOUS_CHARS for char in password)
+
+    charset_size = 0
+
+    if has_upper:
+        charset_size += len(UPPERCASE)
+    if has_lower:
+        charset_size += len(LOWERCASE)
+    if has_number:
+        charset_size += len(NUMBERS)
+    if has_symbol:
+        charset_size += len(SYMBOLS)
+
+    entropy = calculate_entropy(length, charset_size)
 
     return {
-        "algoritmo": "AES-256-GCM",
-        "salt": base64.b64encode(salt).decode('utf-8'),
-        "nonce": base64.b64encode(nonce).decode('utf-8'),
-        "ciphertext": base64.b64encode(ciphertext).decode('utf-8'),
+        "length": length,
+        "uppercase": has_upper,
+        "lowercase": has_lower,
+        "numbers": has_number,
+        "symbols": has_symbol,
+        "ambiguous_chars": has_ambiguous,
+        "entropy_bits": round(entropy, 2),
+        "rating": rate_entropy(entropy),
     }
 
 
-def cifrar_con_chacha20(plaintext: str, key: bytes, salt: bytes) -> dict:
-    chacha = ChaCha20Poly1305(key)
-    nonce = os.urandom(NONCE_SIZE)
-    ciphertext = chacha.encrypt(nonce, plaintext.encode('utf-8'), None)
+def format_bool(value: bool) -> str:
+    return "yes" if value else "no"
 
-    return {
-        "algoritmo": "ChaCha20-Poly1305",
-        "salt": base64.b64encode(salt).decode('utf-8'),
-        "nonce": base64.b64encode(nonce).decode('utf-8'),
-        "ciphertext": base64.b64encode(ciphertext).decode('utf-8'),
+
+def print_generation_result(
+    password: str,
+    profile: str,
+    charset_size: int,
+    entropy_bits: float,
+    quiet: bool,
+    as_json: bool,
+) -> None:
+    """Imprime el resultado de generación."""
+
+    if quiet:
+        print(password)
+        return
+
+    payload = {
+        "password": password,
+        "profile": profile,
+        "length": len(password),
+        "charset_size": charset_size,
+        "entropy_bits": round(entropy_bits, 2),
+        "rating": rate_entropy(entropy_bits),
     }
 
-# ===================================================================
-# GUARDADO EN ARCHIVO
-# ===================================================================
+    if as_json:
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return
 
-def guardar_en_archivo_modo_todo(usuario: str, contrasena: str,
-                                 hash256: str, hash512: str,
-                                 aes_info: dict, chacha_info: dict,
-                                 passphrase: str):
-    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open("contrasenas_generadas.txt", "a", encoding="utf-8") as f:
-        f.write(f"[{fecha}]\n")
-        f.write(f"Usuario        : {usuario}\n")
-        f.write(f"Contraseña     : {contrasena}\n")
-        f.write(f"Clave maestra  : {passphrase}\n")
-        f.write(f"Hash SHA-256   : {hash256}\n")
-        f.write(f"Hash SHA-512   : {hash512}\n")
-        f.write("AES-256-GCM:\n")
-        f.write(f"  Salt (base64)  : {aes_info['salt']}\n")
-        f.write(f"  Nonce (base64) : {aes_info['nonce']}\n")
-        f.write(f"  Ciphertext     : {aes_info['ciphertext']}\n")
-        f.write("ChaCha20-Poly1305:\n")
-        f.write(f"  Salt (base64)  : {chacha_info['salt']}\n")
-        f.write(f"  Nonce (base64) : {chacha_info['nonce']}\n")
-        f.write(f"  Ciphertext     : {chacha_info['ciphertext']}\n")
-        f.write("-" * 70 + "\n")
+    print(f"{APP_NAME.upper()} — Secure Password Generator")
+    print("-" * 42)
+    print(f"Password : {password}")
+    print(f"Profile  : {profile}")
+    print(f"Length   : {len(password)}")
+    print(f"Charset  : {charset_size} characters")
+    print(f"Entropy  : ~{round(entropy_bits, 2)} bits")
+    print(f"Rating   : {rate_entropy(entropy_bits)}")
 
 
-def guardar_en_archivo_solo_aes(usuario: str, aes_info: dict, passphrase: str):
-    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open("contrasenas_generadas.txt", "a", encoding="utf-8") as f:
-        f.write(f"[{fecha}]\n")
-        f.write(f"Usuario        : {usuario}\n")
-        f.write(f"Clave maestra  : {passphrase}\n")
-        f.write("AES-256-GCM:\n")
-        f.write(f"  Salt (base64)  : {aes_info['salt']}\n")
-        f.write(f"  Nonce (base64) : {aes_info['nonce']}\n")
-        f.write(f"  Ciphertext     : {aes_info['ciphertext']}\n")
-        f.write("-" * 70 + "\n")
+def print_check_result(result: dict[str, object], as_json: bool) -> None:
+    """Imprime el resultado del análisis de contraseña."""
+
+    if as_json:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return
+
+    print(f"{APP_NAME.upper()} — Password Check")
+    print("-" * 42)
+    print(f"Length          : {result['length']}")
+    print(f"Uppercase       : {format_bool(bool(result['uppercase']))}")
+    print(f"Lowercase       : {format_bool(bool(result['lowercase']))}")
+    print(f"Numbers         : {format_bool(bool(result['numbers']))}")
+    print(f"Symbols         : {format_bool(bool(result['symbols']))}")
+    print(f"Ambiguous chars : {format_bool(bool(result['ambiguous_chars']))}")
+    print(f"Entropy         : ~{result['entropy_bits']} bits")
+    print(f"Rating          : {result['rating']}")
 
 
-def guardar_en_archivo_solo_chacha(usuario: str, chacha_info: dict, passphrase: str):
-    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open("contrasenas_generadas.txt", "a", encoding="utf-8") as f:
-        f.write(f"[{fecha}]\n")
-        f.write(f"Usuario        : {usuario}\n")
-        f.write(f"Clave maestra  : {passphrase}\n")
-        f.write("ChaCha20-Poly1305:\n")
-        f.write(f"  Salt (base64)  : {chacha_info['salt']}\n")
-        f.write(f"  Nonce (base64) : {chacha_info['nonce']}\n")
-        f.write(f"  Ciphertext     : {chacha_info['ciphertext']}\n")
-        f.write("-" * 70 + "\n")
-
-# ===================================================================
-# ARGUMENTOS CLI
-# ===================================================================
-
-def configurar_argumentos():
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="🎣 carnada — Generador de contraseñas seguras con hashing y cifrado",
+        prog=APP_NAME,
+        description="Local-first CLI password generator and password checker.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
-            "Ejemplos:\n"
-            "  python carnada.py --user rhodyn\n"
-            "  python carnada.py -u juan -l 20 --save\n"
-            "  python carnada.py -u admin --cipher aes --save\n"
-            "  python carnada.py -u root --cipher chacha --save"
-        )
+            "Examples:\n"
+            "  python carnada.py\n"
+            "  python carnada.py -l 24\n"
+            "  python carnada.py --profile legacy\n"
+            "  python carnada.py --count 5\n"
+            "  python carnada.py --quiet\n"
+            "  python carnada.py --json\n"
+            "  python carnada.py check\n"
+            "  python carnada.py check \"Password123!\"\n"
+        ),
     )
-
-    parser.add_argument("--user", "-u", type=str, default=None,
-                        help="Nombre de usuario (si no se proporciona, se pedirá)")
-    
-    parser.add_argument("--length", "-l", type=int, default=DEFAULT_LENGTH,
-                        help=f"Longitud de la contraseña (default: {DEFAULT_LENGTH})")
-    
-    parser.add_argument("--no-mayus", action="store_true", help="No incluir mayúsculas")
-    parser.add_argument("--no-minus", action="store_true", help="No incluir minúsculas")
-    parser.add_argument("--no-numbers", action="store_true", help="No incluir números")
-    parser.add_argument("--no-symbols", action="store_true", help="No incluir símbolos")
-    
-    parser.add_argument("--save", "-s", action="store_true",
-                        help="Guardar en archivo contrasenas_generadas.txt")
 
     parser.add_argument(
-        "--cipher",
-        choices=["none", "aes", "chacha"],
-        default="none",
-        help="Modo de salida: none = todo, aes = solo AES, chacha = solo ChaCha20"
+        "--version",
+        action="version",
+        version=f"{APP_NAME} {APP_VERSION}",
     )
 
-    return parser.parse_args()
+    subparsers = parser.add_subparsers(dest="command")
 
-# ===================================================================
-# PROGRAMA PRINCIPAL
-# ===================================================================
-
-def main():
-    args = configurar_argumentos()
-
-    # Usuario
-    if not args.user:
-        while True:
-            usuario = input("Ingrese el nombre de usuario: ").strip()
-            if usuario:
-                break
-            print("❌ El nombre de usuario no puede estar vacío.")
-    else:
-        usuario = args.user
-
-    if args.length < 8:
-        print("⚠️ Longitud mínima recomendada: 8. Se ajustará automáticamente.")
-
-    # Clave maestra (siempre)
-    print("\nSe requiere una clave maestra para derivar la clave de cifrado.")
-    passphrase = getpass("Ingrese clave maestra: ")
-    passphrase_confirm = getpass("Confirme clave maestra: ")
-
-    if passphrase != passphrase_confirm:
-        print("❌ Las claves maestras no coinciden. Abortando.")
-        sys.exit(1)
-
-    # Generar contraseña
-    contrasena = generar_contrasena(
-        longitud=args.length,
-        incluir_mayus=not args.no_mayus,
-        incluir_minus=not args.no_minus,
-        incluir_numeros=not args.no_numbers,
-        incluir_simbolos=not args.no_symbols
+    generate_parser = subparsers.add_parser(
+        "generate",
+        help="Generate secure passwords.",
     )
 
-    # Hashes
-    hash256 = generar_hash_sha256(contrasena)
-    hash512 = generar_hash_sha512(contrasena)
+    add_generate_arguments(generate_parser)
 
-    # Derivar UNA sola clave para AES y ChaCha
-    salt = os.urandom(SALT_SIZE)
-    key = derivar_clave_desde_passphrase(passphrase, salt)
+    check_parser = subparsers.add_parser(
+        "check",
+        help="Check password strength locally.",
+    )
 
-    aes_info = None
-    chacha_info = None
+    check_parser.add_argument(
+        "password",
+        nargs="?",
+        help="Password to check. If omitted, it will be requested securely.",
+    )
 
-    # Cifrado según modo
-    if args.cipher == "none":
-        aes_info = cifrar_con_aes256(contrasena, key, salt)
-        chacha_info = cifrar_con_chacha20(contrasena, key, salt)
-    elif args.cipher == "aes":
-        aes_info = cifrar_con_aes256(contrasena, key, salt)
-    elif args.cipher == "chacha":
-        chacha_info = cifrar_con_chacha20(contrasena, key, salt)
+    check_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print output as JSON.",
+    )
 
-    # Salida en pantalla
-    print("\n" + "="*70)
-    print("                 🎣 CARNADA — PASSWORD TOOL")
-    print("="*70)
-    print(f"Usuario               : {usuario}")
-    print(f"Contraseña            : {contrasena}")
-    print(f"Longitud              : {len(contrasena)} caracteres")
-    print(f"Clave maestra         : {passphrase}")
+    add_generate_arguments(parser)
 
-    if args.cipher == "none":
-        print("-" * 70)
-        print("SHA-256 — Hash criptográfico usado en blockchain, firmas digitales y verificación de integridad.")
-        print(f"Hash SHA-256          : {hash256}")
-        print()
-        print("SHA-512 — Variante más robusta de SHA-2, usada en sistemas de alta seguridad.")
-        print(f"Hash SHA-512          : {hash512}")
-        print("-" * 70)
-        print("AES-256-GCM — Cifrado autenticado usado en HTTPS, VPNs y almacenamiento seguro.")
-        print(f"Salt (base64)         : {aes_info['salt']}")
-        print(f"Nonce (base64)        : {aes_info['nonce']}")
-        print(f"Ciphertext (base64)   : {aes_info['ciphertext']}")
-        print("-" * 70)
-        print("ChaCha20-Poly1305 — Cifrado moderno usado en TLS 1.3, WireGuard y dispositivos móviles.")
-        print(f"Salt (base64)         : {chacha_info['salt']}")
-        print(f"Nonce (base64)        : {chacha_info['nonce']}")
-        print(f"Ciphertext (base64)   : {chacha_info['ciphertext']}")
-    elif args.cipher == "aes":
-        print("-" * 70)
-        print("AES-256-GCM — Cifrado autenticado usado en HTTPS, VPNs y almacenamiento seguro.")
-        print(f"Salt (base64)         : {aes_info['salt']}")
-        print(f"Nonce (base64)        : {aes_info['nonce']}")
-        print(f"Ciphertext (base64)   : {aes_info['ciphertext']}")
-    elif args.cipher == "chacha":
-        print("-" * 70)
-        print("ChaCha20-Poly1305 — Cifrado moderno usado en TLS 1.3, WireGuard y dispositivos móviles.")
-        print(f"Salt (base64)         : {chacha_info['salt']}")
-        print(f"Nonce (base64)        : {chacha_info['nonce']}")
-        print(f"Ciphertext (base64)   : {chacha_info['ciphertext']}")
+    return parser
 
-    print("="*70)
 
-    # Guardado según modo
-    if args.save:
-        if args.cipher == "none":
-            guardar_en_archivo_modo_todo(
-                usuario, contrasena, hash256, hash512,
-                aes_info, chacha_info, passphrase
-            )
-        elif args.cipher == "aes":
-            guardar_en_archivo_solo_aes(usuario, aes_info, passphrase)
-        elif args.cipher == "chacha":
-            guardar_en_archivo_solo_chacha(usuario, chacha_info, passphrase)
-        print("✅ Resultado guardado correctamente en 'contrasenas_generadas.txt'")
+def add_generate_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--profile",
+        choices=sorted(PROFILES.keys()),
+        default="strong",
+        help="Password generation profile. Default: strong.",
+    )
 
-    print("¡Mantén esta información en un lugar seguro!\n")
+    parser.add_argument(
+        "--length",
+        "-l",
+        type=int,
+        default=None,
+        help="Password length. Overrides profile default.",
+    )
+
+    parser.add_argument(
+        "--count",
+        "-c",
+        type=int,
+        default=1,
+        help="Number of passwords to generate. Default: 1.",
+    )
+
+    parser.add_argument(
+        "--no-upper",
+        action="store_true",
+        help="Exclude uppercase letters.",
+    )
+
+    parser.add_argument(
+        "--no-lower",
+        action="store_true",
+        help="Exclude lowercase letters.",
+    )
+
+    parser.add_argument(
+        "--no-numbers",
+        action="store_true",
+        help="Exclude numbers.",
+    )
+
+    parser.add_argument(
+        "--no-symbols",
+        action="store_true",
+        help="Exclude symbols.",
+    )
+
+    parser.add_argument(
+        "--allow-ambiguous",
+        action="store_true",
+        help="Allow ambiguous characters such as O, 0, I, 1, l and o.",
+    )
+
+    parser.add_argument(
+        "--quiet",
+        "-q",
+        action="store_true",
+        help="Print only the generated password.",
+    )
+
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print output as JSON.",
+    )
+
+
+def run_generate(args: argparse.Namespace) -> int:
+    profile = PROFILES[args.profile]
+
+    length = args.length if args.length is not None else profile.length
+
+    use_upper = profile.use_upper and not args.no_upper
+    use_lower = profile.use_lower and not args.no_lower
+    use_numbers = profile.use_numbers and not args.no_numbers
+    use_symbols = profile.use_symbols and not args.no_symbols
+
+    allow_ambiguous = args.allow_ambiguous or profile.allow_ambiguous
+
+    if args.count < 1:
+        print("Error: --count must be greater than 0.", file=sys.stderr)
+        return 1
+
+    if length < MIN_LENGTH and args.profile != "pin":
+        print(
+            f"Warning: minimum recommended length is {MIN_LENGTH}. "
+            f"Using {MIN_LENGTH}.",
+            file=sys.stderr,
+        )
+        length = MIN_LENGTH
+
+    groups = get_charset_groups(
+        use_upper=use_upper,
+        use_lower=use_lower,
+        use_numbers=use_numbers,
+        use_symbols=use_symbols,
+        allow_ambiguous=allow_ambiguous,
+        profile_name=args.profile,
+    )
+
+    if not groups:
+        print("Error: at least one character group must be enabled.", file=sys.stderr)
+        return 1
+
+    charset_size = len(set("".join(groups)))
+    entropy_bits = calculate_entropy(length, charset_size)
+
+    passwords = [generate_password(length, groups) for _ in range(args.count)]
+
+    if args.json:
+        payload = {
+            "profile": args.profile,
+            "count": args.count,
+            "length": length,
+            "charset_size": charset_size,
+            "entropy_bits": round(entropy_bits, 2),
+            "rating": rate_entropy(entropy_bits),
+            "passwords": passwords,
+        }
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.quiet:
+        for password in passwords:
+            print(password)
+        return 0
+
+    if args.count == 1:
+        print_generation_result(
+            password=passwords[0],
+            profile=args.profile,
+            charset_size=charset_size,
+            entropy_bits=entropy_bits,
+            quiet=False,
+            as_json=False,
+        )
+        return 0
+
+    print(f"{APP_NAME.upper()} — Secure Password Generator")
+    print("-" * 42)
+    print(f"Profile  : {args.profile}")
+    print(f"Count    : {args.count}")
+    print(f"Length   : {length}")
+    print(f"Entropy  : ~{round(entropy_bits, 2)} bits each")
+    print(f"Rating   : {rate_entropy(entropy_bits)}")
+    print("-" * 42)
+
+    for index, password in enumerate(passwords, start=1):
+        print(f"{index:02d}. {password}")
+
+    return 0
+
+
+def run_check(args: argparse.Namespace) -> int:
+    password = args.password
+
+    if password is None:
+        password = getpass("Password to check: ")
+
+    if not password:
+        print("Error: password cannot be empty.", file=sys.stderr)
+        return 1
+
+    result = analyze_password(password)
+    print_check_result(result, as_json=args.json)
+
+    return 0
+
+
+def main() -> int:
+    parser = build_parser()
+    args = parser.parse_args()
+
+    if args.command == "check":
+        return run_check(args)
+
+    return run_generate(args)
 
 
 if __name__ == "__main__":
     try:
-        main()
+        raise SystemExit(main())
     except KeyboardInterrupt:
-        print("\n\n⚠️  Programa interrumpido por el usuario.")
-        sys.exit(0)
-    except Exception as e:
-        print(f"\n❌ Error inesperado: {e}")
-        sys.exit(1)
-
+        print("\nInterrupted by user.", file=sys.stderr)
+        raise SystemExit(130)
