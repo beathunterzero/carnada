@@ -1,45 +1,44 @@
 # CARNADA Architecture Overview
 
-`carnada` is designed as a small local-first command-line tool.
+`carnada` está diseñada como una herramienta pequeña de línea de comandos con enfoque local-first.
 
-The architecture follows a simple flow: receive user input from the shell, resolve the execution mode, generate or analyze a password, calculate useful metadata, and return clean output to the terminal.
+La arquitectura sigue un flujo simple: recibir la entrada del usuario desde la shell, resolver el modo de ejecución, generar o analizar una contraseña, calcular metadatos útiles y devolver una salida limpia en la terminal.
 
-The tool does not use external services, does not store secrets, and does not require third-party dependencies.
-
----
-
-# Design Principles
-
-The architecture is based on the following principles:
-
-- local execution only;
-    
-- no password storage;
-    
-- no network communication;
-    
-- no external dependencies;
-    
-- clear separation between generation, analysis, formatting, and CLI parsing;
-    
-- minimal operational risk;
-    
-- clean output suitable for terminal usage and scripting.
-    
-
-`carnada` is intentionally small in scope. It is not a password manager, not a vault, and not a secret storage system.
+La herramienta no utiliza servicios externos, no almacena secretos y no requiere dependencias de terceros.
 
 ---
 
-# High-Level Architecture
+# Principios de diseño
 
-The tool is organized around a single executable Python script:
+La arquitectura se basa en los siguientes principios:
+
+- ejecución únicamente local;
+
+- sin almacenamiento de contraseñas;
+
+- sin comunicación de red;
+
+- sin dependencias externas;
+
+- separación clara entre generación, análisis, formateo y parsing de CLI;
+
+- riesgo operativo mínimo;
+
+- salida limpia adecuada para uso en terminal y scripting.
+
+`carnada` tiene un alcance intencionalmente reducido. No es un gestor de contraseñas, no es una bóveda y no es un sistema de almacenamiento de secretos.
+
+---
+
+# Arquitectura de alto nivel
+
+La herramienta está organizada alrededor de un único script ejecutable de Python:
 
 ```text
 carnada.py
-```
+````
 
-Internally, the script is divided into logical components:
+Internamente, el script se divide en componentes lógicos:
 
 ```text
 CLI Parser
@@ -51,11 +50,11 @@ Entropy Calculator
 Output Formatter
 ```
 
-Each component has a specific responsibility.
+Cada componente tiene una responsabilidad específica.
 
 ---
 
-# Architecture Diagram
+# Diagrama de arquitectura
 
 ```text
 User / Shell
@@ -92,13 +91,13 @@ Entropy Calculator         Output Formatter
 
 ---
 
-# Component Responsibilities
+# Responsabilidades de los componentes
 
 ## 1. CLI Parser
 
-The CLI parser receives and validates command-line arguments.
+El parser de CLI recibe y valida los argumentos de línea de comandos.
 
-It is responsible for handling commands such as:
+Es responsable de manejar comandos como:
 
 ```bash
 python3 carnada.py
@@ -109,116 +108,113 @@ python3 carnada.py --json
 python3 carnada.py check
 ```
 
-Main responsibilities:
+Responsabilidades principales:
 
-- parse command-line arguments;
-    
-- identify the execution mode;
-    
-- validate accepted options;
-    
-- route execution to generate mode or check mode.
-    
+* interpretar argumentos de línea de comandos;
 
-The parser is implemented using Python’s standard `argparse` module.
+* identificar el modo de ejecución;
+
+* validar opciones aceptadas;
+
+* enrutar la ejecución hacia el modo de generación o el modo de revisión.
+
+El parser está implementado usando el módulo estándar `argparse` de Python.
 
 ---
 
 ## 2. Generate Mode
 
-Generate mode is the default behavior of the tool.
+El modo de generación es el comportamiento por defecto de la herramienta.
 
-Its purpose is to create one or more secure passwords using cryptographically secure randomness.
+Su propósito es crear una o más contraseñas seguras utilizando aleatoriedad criptográficamente segura.
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py
 ```
 
-Main responsibilities:
+Responsabilidades principales:
 
-- load the selected profile;
-    
-- apply user overrides such as length or disabled character groups;
-    
-- build the final character set;
-    
-- generate the requested number of passwords;
-    
-- calculate entropy metadata;
-    
-- format the result for terminal output.
-    
+* cargar el perfil seleccionado;
+
+* aplicar modificaciones del usuario, como longitud o grupos de caracteres deshabilitados;
+
+* construir el conjunto final de caracteres;
+
+* generar la cantidad solicitada de contraseñas;
+
+* calcular metadatos de entropía;
+
+* formatear el resultado para salida en terminal.
 
 ---
 
 ## 3. Check Mode
 
-Check mode analyzes an existing password locally.
+El modo de revisión analiza una contraseña existente de forma local.
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py check
 ```
 
-The password can be provided as an argument or requested interactively.
+La contraseña puede proporcionarse como argumento o solicitarse de forma interactiva.
 
-Example with direct input:
+Ejemplo con entrada directa:
 
 ```bash
 python3 carnada.py check "Password123!"
 ```
 
-Example with hidden input:
+Ejemplo con entrada oculta:
 
 ```bash
 python3 carnada.py check
 ```
 
-Main responsibilities:
+Responsabilidades principales:
 
-- receive a password for analysis;
-    
-- detect character categories;
-    
-- detect ambiguous characters;
-    
-- estimate entropy;
-    
-- assign a strength rating;
-    
-- print the result without storing the password.
-    
+* recibir una contraseña para análisis;
 
-When no password is passed as an argument, the tool should request it securely using hidden input.
+* detectar categorías de caracteres;
+
+* detectar caracteres ambiguos;
+
+* estimar entropía;
+
+* asignar una clasificación de fortaleza;
+
+* imprimir el resultado sin almacenar la contraseña.
+
+Cuando no se pasa una contraseña como argumento, la herramienta debe solicitarla de forma segura usando entrada oculta.
 
 ---
 
-# Generation Flow
+# Flujo de generación
 
-The generation flow works as follows:
+El flujo de generación funciona de la siguiente manera:
 
 ```text
-1. User runs carnada from the shell.
-2. CLI parser reads arguments.
-3. The selected profile is loaded.
-4. Optional user overrides are applied.
-5. Character groups are built.
-6. Password is generated using cryptographically secure randomness.
-7. Entropy is estimated.
-8. Result is formatted.
-9. Output is printed to the terminal.
+1. El usuario ejecuta carnada desde la shell.
+2. El CLI parser lee los argumentos.
+3. Se carga el perfil seleccionado.
+4. Se aplican modificaciones opcionales del usuario.
+5. Se construyen los grupos de caracteres.
+6. La contraseña se genera usando aleatoriedad criptográficamente segura.
+7. Se estima la entropía.
+8. Se formatea el resultado.
+9. La salida se imprime en la terminal.
 ```
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py --profile strong -l 24
 ```
 
-Expected internal flow:
+Flujo interno esperado:
 
 ```text
 profile = strong
@@ -230,27 +226,27 @@ output = normal terminal format
 
 ---
 
-# Check Flow
+# Flujo de revisión
 
-The check flow works as follows:
+El flujo de revisión funciona de la siguiente manera:
 
 ```text
-1. User runs carnada in check mode.
-2. CLI parser detects the check command.
-3. Password is received from argument or hidden prompt.
-4. Analyzer inspects password structure.
-5. Entropy is estimated.
-6. Strength rating is calculated.
-7. Output is printed to the terminal.
+1. El usuario ejecuta carnada en modo check.
+2. El CLI parser detecta el comando check.
+3. La contraseña se recibe desde argumento o prompt oculto.
+4. El analizador inspecciona la estructura de la contraseña.
+5. Se estima la entropía.
+6. Se calcula la clasificación de fortaleza.
+7. La salida se imprime en la terminal.
 ```
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py check
 ```
 
-Expected internal flow:
+Flujo interno esperado:
 
 ```text
 input = hidden password prompt
@@ -260,15 +256,15 @@ output = password check report
 
 ---
 
-# Password Generation Design
+# Diseño de generación de contraseñas
 
-Password generation uses Python’s `secrets` module.
+La generación de contraseñas utiliza el módulo `secrets` de Python.
 
-This module is designed for generating cryptographically secure random values.
+Este módulo está diseñado para generar valores aleatorios criptográficamente seguros.
 
-The generator should ensure that at least one character from each active character group is included.
+El generador debe asegurar que se incluya al menos un carácter de cada grupo de caracteres activo.
 
-For example, if the active groups are:
+Por ejemplo, si los grupos activos son:
 
 ```text
 uppercase
@@ -277,17 +273,17 @@ numbers
 symbols
 ```
 
-The generated password should contain at least one character from each group.
+La contraseña generada debe contener al menos un carácter de cada grupo.
 
-After selecting the required characters, the remaining characters are selected randomly from the full character pool. The final list is shuffled before being returned.
+Después de seleccionar los caracteres requeridos, los caracteres restantes se eligen aleatoriamente desde el conjunto completo de caracteres. La lista final se mezcla antes de devolverse.
 
-This avoids generating passwords that accidentally miss an enabled category.
+Esto evita generar contraseñas que accidentalmente no incluyan una categoría habilitada.
 
 ---
 
-# Character Groups
+# Grupos de caracteres
 
-`carnada` uses configurable character groups:
+`carnada` utiliza grupos de caracteres configurables:
 
 ```text
 uppercase letters
@@ -296,9 +292,9 @@ numbers
 symbols
 ```
 
-The tool can also remove visually ambiguous characters by default.
+La herramienta también puede remover caracteres visualmente ambiguos por defecto.
 
-Examples of ambiguous characters:
+Ejemplos de caracteres ambiguos:
 
 ```text
 O
@@ -309,15 +305,15 @@ l
 o
 ```
 
-This improves readability when passwords need to be copied manually or typed into another device.
+Esto mejora la legibilidad cuando las contraseñas deben copiarse manualmente o escribirse en otro dispositivo.
 
 ---
 
-# Profiles
+# Perfiles
 
-Profiles define default generation behavior for specific use cases.
+Los perfiles definen el comportamiento de generación por defecto para casos de uso específicos.
 
-Current profiles:
+Perfiles actuales:
 
 ```text
 strong
@@ -329,9 +325,9 @@ wifi
 
 ## strong
 
-Default profile for general usage.
+Perfil por defecto para uso general.
 
-Uses:
+Utiliza:
 
 ```text
 uppercase
@@ -342,9 +338,9 @@ symbols
 
 ## legacy
 
-Designed for older or restrictive systems.
+Diseñado para sistemas antiguos o restrictivos.
 
-Uses:
+Utiliza:
 
 ```text
 uppercase
@@ -354,9 +350,9 @@ numbers
 
 ## pin
 
-Designed for numeric codes.
+Diseñado para códigos numéricos.
 
-Uses:
+Utiliza:
 
 ```text
 numbers
@@ -364,9 +360,9 @@ numbers
 
 ## hex
 
-Designed for hexadecimal tokens.
+Diseñado para tokens hexadecimales.
 
-Uses:
+Utiliza:
 
 ```text
 0123456789abcdef
@@ -374,9 +370,9 @@ Uses:
 
 ## wifi
 
-Designed for long Wi-Fi passwords that are easier to type manually.
+Diseñado para contraseñas Wi-Fi largas y más fáciles de escribir manualmente.
 
-Uses:
+Utiliza:
 
 ```text
 uppercase
@@ -386,23 +382,23 @@ numbers
 
 ---
 
-# Entropy Estimation
+# Estimación de entropía
 
-`carnada` estimates entropy using password length and character set size.
+`carnada` estima la entropía usando la longitud de la contraseña y el tamaño del conjunto de caracteres.
 
-Conceptually:
+Conceptualmente:
 
 ```text
 entropy = password_length × log2(character_set_size)
 ```
 
-The result is shown in bits.
+El resultado se muestra en bits.
 
-This value is an approximation. It is useful for comparing generated passwords, but it is not a complete security guarantee.
+Este valor es una aproximación. Es útil para comparar contraseñas generadas, pero no representa una garantía completa de seguridad.
 
-The final strength rating is derived from the estimated entropy.
+La clasificación final de fortaleza se deriva de la entropía estimada.
 
-Example rating model:
+Modelo de clasificación de ejemplo:
 
 ```text
 less than 40 bits      weak
@@ -413,11 +409,11 @@ less than 40 bits      weak
 
 ---
 
-# Output Layer
+# Capa de salida
 
-The output layer formats results for different usage scenarios.
+La capa de salida formatea los resultados para diferentes escenarios de uso.
 
-Supported output modes:
+Modos de salida soportados:
 
 ```text
 normal
@@ -427,9 +423,9 @@ JSON
 
 ## Normal Output
 
-Human-readable terminal output.
+Salida legible para humanos en la terminal.
 
-Example:
+Ejemplo:
 
 ```text
 CARNADA — Secure Password Generator
@@ -444,17 +440,17 @@ Rating   : very strong
 
 ## Quiet Output
 
-Prints only the generated password.
+Imprime únicamente la contraseña generada.
 
-This is useful for shell scripting.
+Esto es útil para shell scripting.
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py --quiet
 ```
 
-Output:
+Salida:
 
 ```text
 V7#kQm92@tLx8pRz
@@ -462,15 +458,15 @@ V7#kQm92@tLx8pRz
 
 ## JSON Output
 
-Provides structured output for automation.
+Proporciona una salida estructurada para automatización.
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py --json
 ```
 
-Output:
+Salida:
 
 ```json
 {
@@ -488,9 +484,9 @@ Output:
 
 ---
 
-# Security Boundaries
+# Límites de seguridad
 
-`carnada` does not cross the following boundaries:
+`carnada` no cruza los siguientes límites:
 
 ```text
 no password storage
@@ -502,31 +498,31 @@ no cloud synchronization
 no database
 ```
 
-This boundary is intentional.
+Este límite es intencional.
 
-The tool generates or checks passwords locally and then exits.
+La herramienta genera o revisa contraseñas localmente y luego finaliza su ejecución.
 
 ---
 
-# Data Handling
+# Manejo de datos
 
-`carnada` does not persist generated or checked passwords.
+`carnada` no persiste contraseñas generadas ni contraseñas revisadas.
 
-Data exists only during execution.
+Los datos existen únicamente durante la ejecución.
 
-The tool does not create output files by default.
+La herramienta no crea archivos de salida por defecto.
 
-Password input in check mode should use hidden input when no password is provided as an argument.
+La entrada de contraseña en modo check debe usar entrada oculta cuando no se proporciona una contraseña como argumento.
 
-Users should avoid passing sensitive real passwords directly in the command line because shell history may store them.
+Los usuarios deben evitar pasar contraseñas reales sensibles directamente en la línea de comandos, porque el historial de la shell podría almacenarlas.
 
-Recommended:
+Recomendado:
 
 ```bash
 python3 carnada.py check
 ```
 
-Less recommended:
+Menos recomendado:
 
 ```bash
 python3 carnada.py check "MySensitivePassword"
@@ -534,11 +530,11 @@ python3 carnada.py check "MySensitivePassword"
 
 ---
 
-# Dependency Model
+# Modelo de dependencias
 
-`carnada` uses only the Python standard library.
+`carnada` utiliza únicamente la biblioteca estándar de Python.
 
-Main modules:
+Módulos principales:
 
 ```text
 argparse
@@ -551,44 +547,44 @@ dataclasses
 getpass
 ```
 
-No external dependencies are required.
+No se requieren dependencias externas.
 
-This keeps installation simple and reduces supply chain risk.
+Esto mantiene la instalación simple y reduce el riesgo de supply chain.
 
 ---
 
-# Execution Model
+# Modelo de ejecución
 
-The tool can be executed directly with Python:
+La herramienta puede ejecutarse directamente con Python:
 
 ```bash
 python3 carnada.py
 ```
 
-On Linux, WSL, or macOS, it can also be executed directly if the file has executable permissions:
+En Linux, WSL o macOS, también puede ejecutarse directamente si el archivo tiene permisos de ejecución:
 
 ```bash
 chmod +x carnada.py
 ./carnada.py
 ```
 
-The script includes a shebang line:
+El script incluye una línea shebang:
 
 ```python
 #!/usr/bin/env python3
 ```
 
-This allows the system to locate the appropriate Python interpreter.
+Esto permite que el sistema ubique el intérprete de Python adecuado.
 
 ---
 
-# Architecture Scope
+# Alcance de la arquitectura
 
-The current architecture is intentionally simple.
+La arquitectura actual es intencionalmente simple.
 
-`carnada` does not need a package layout or complex module separation at this stage because the project is small and has no external dependencies.
+`carnada` no necesita una estructura de paquete ni separación compleja por módulos en esta etapa, porque el proyecto es pequeño y no tiene dependencias externas.
 
-A single-file architecture is acceptable while the tool remains focused on:
+Una arquitectura de archivo único es aceptable mientras la herramienta se mantenga enfocada en:
 
 ```text
 password generation
@@ -597,7 +593,7 @@ entropy estimation
 terminal output
 ```
 
-If the project grows significantly, it could later be separated into modules such as:
+Si el proyecto crece significativamente, más adelante podría separarse en módulos como:
 
 ```text
 cli.py
@@ -607,16 +603,16 @@ analyzer.py
 formatter.py
 ```
 
-For now, keeping everything in `carnada.py` improves portability and makes the tool easier to audit.
+Por ahora, mantener todo en `carnada.py` mejora la portabilidad y facilita la auditoría de la herramienta.
 
 ---
 
-# Summary
+# Resumen
 
-`carnada` follows a minimal local-first architecture.
+`carnada` sigue una arquitectura mínima con enfoque local-first.
 
-The tool receives input from the shell, routes execution through a CLI parser, performs either password generation or password analysis, estimates entropy, and prints the result in a clean format.
+La herramienta recibe entrada desde la shell, enruta la ejecución mediante un parser de CLI, realiza generación o análisis de contraseñas, estima entropía y muestra el resultado en un formato limpio.
 
-Its main security decision is to avoid storing, transmitting, or managing secrets.
+Su principal decisión de seguridad es evitar almacenar, transmitir o gestionar secretos.
 
-This keeps the project small, auditable, and practical for terminal-based workflows.
+Esto mantiene el proyecto pequeño, auditable y práctico para flujos de trabajo basados en terminal.
