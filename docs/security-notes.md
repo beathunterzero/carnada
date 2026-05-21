@@ -1,112 +1,112 @@
 # CARNADA Security Notes
 
-`carnada` is designed as a local-first CLI tool for generating and checking passwords.
+`carnada` está diseñada como una herramienta CLI local-first para generar y revisar contraseñas.
 
-The main security goal is to keep the tool small, auditable, and operationally safe by avoiding unnecessary handling of secrets.
+El objetivo principal de seguridad es mantener la herramienta pequeña, auditable y operacionalmente segura, evitando el manejo innecesario de secretos.
 
-`carnada` does not store passwords, does not transmit data, does not use remote APIs, and does not act as a password manager.
+`carnada` no almacena contraseñas, no transmite datos, no utiliza APIs remotas y no actúa como gestor de contraseñas.
 
 ---
 
-# Security Model
+# Modelo de seguridad
 
-`carnada` follows a minimal security model:
+`carnada` sigue un modelo de seguridad mínimo:
 
 ```text
-generate or check passwords locally;
-avoid persistent storage of secrets;
-avoid network communication;
-avoid unnecessary dependencies;
-return clean terminal output;
-exit after execution.
-```
+generar o revisar contraseñas localmente;
+evitar almacenamiento persistente de secretos;
+evitar comunicación de red;
+evitar dependencias innecesarias;
+devolver salida limpia en terminal;
+finalizar después de la ejecución.
+````
 
-This model reduces operational risk and keeps the behavior predictable.
+Este modelo reduce el riesgo operativo y mantiene un comportamiento predecible.
 
 ---
 
-# Local-First Execution
+# Ejecución local-first
 
-All operations are executed locally on the user’s machine.
+Todas las operaciones se ejecutan localmente en el equipo del usuario.
 
-`carnada` does not:
+`carnada` no:
 
 ```text
-connect to external services;
-send passwords to remote systems;
-perform telemetry;
-sync data to the cloud;
-write generated passwords to disk by default.
+se conecta a servicios externos;
+envía contraseñas a sistemas remotos;
+realiza telemetría;
+sincroniza datos con la nube;
+escribe contraseñas generadas en disco por defecto.
 ```
 
-This makes the tool suitable for terminal-based workflows where the user wants a simple local password generator or checker.
+Esto hace que la herramienta sea adecuada para flujos de trabajo basados en terminal donde el usuario necesita un generador o revisor simple de contraseñas locales.
 
 ---
 
-# No Password Storage
+# Sin almacenamiento de contraseñas
 
-`carnada` intentionally does not store generated or checked passwords.
+`carnada` intencionalmente no almacena contraseñas generadas ni contraseñas revisadas.
 
-This is a design decision.
+Esta es una decisión de diseño.
 
-The tool is not a password manager and does not provide a vault, database, encrypted storage, recovery mechanism, synchronization, or credential lifecycle management.
+La herramienta no es un gestor de contraseñas y no proporciona bóveda, base de datos, almacenamiento cifrado, mecanismo de recuperación, sincronización ni gestión del ciclo de vida de credenciales.
 
-Generated and checked passwords exist only during runtime and are printed to the terminal when requested.
+Las contraseñas generadas y revisadas existen únicamente durante la ejecución y se imprimen en la terminal cuando el usuario lo solicita.
 
-Users should store permanent credentials in a dedicated password manager.
-
----
-
-# No Encryption Layer
-
-Earlier versions or experimental designs may include encryption concepts, but the current design intentionally avoids encryption features.
-
-This is because encryption only becomes useful when the tool stores or transports secrets.
-
-Since `carnada` does not store secrets, adding encryption would increase complexity without adding meaningful protection to the core use case.
-
-Avoiding encryption also reduces the risk of poor key handling, unsafe file storage, accidental plaintext exposure, or misleading security assumptions.
+Los usuarios deben almacenar credenciales permanentes en un gestor de contraseñas dedicado.
 
 ---
 
-# No Password Hashing
+# Sin capa de cifrado
 
-`carnada` does not generate SHA-256 or SHA-512 hashes of passwords.
+Versiones anteriores o diseños experimentales pueden incluir conceptos de cifrado, pero el diseño actual evita intencionalmente funciones de cifrado.
 
-This is intentional.
+Esto se debe a que el cifrado solo aporta valor cuando la herramienta almacena o transporta secretos.
 
-Fast hash functions such as SHA-256 and SHA-512 are not appropriate for secure password storage by themselves. Password storage requires dedicated password hashing or key derivation mechanisms such as Argon2id, bcrypt, scrypt, or PBKDF2 with appropriate parameters.
+Como `carnada` no almacena secretos, agregar cifrado aumentaría la complejidad sin añadir protección significativa al caso de uso principal.
 
-Because `carnada` is not a password storage system, password hashing is outside the scope of the tool.
-
----
-
-# Randomness Source
-
-Password generation uses Python’s `secrets` module.
-
-The `secrets` module is designed for generating cryptographically strong random numbers suitable for managing secrets such as passwords, account authentication tokens, and similar values.
-
-`carnada` does not use Python’s `random` module for password generation.
-
-The `random` module is not suitable for cryptographic use because its output is not designed to be unpredictable against attackers.
+Evitar el cifrado también reduce el riesgo de manejo deficiente de claves, almacenamiento inseguro de archivos, exposición accidental en texto claro o supuestos de seguridad engañosos.
 
 ---
 
-# Character Set Design
+# Sin hashing de contraseñas
 
-`carnada` supports configurable character groups:
+`carnada` no genera hashes SHA-256 ni SHA-512 de contraseñas.
+
+Esto es intencional.
+
+Funciones hash rápidas como SHA-256 y SHA-512 no son apropiadas por sí solas para almacenamiento seguro de contraseñas. El almacenamiento de contraseñas requiere mecanismos dedicados de password hashing o derivación de claves como Argon2id, bcrypt, scrypt o PBKDF2 con parámetros adecuados.
+
+Debido a que `carnada` no es un sistema de almacenamiento de contraseñas, el hashing de contraseñas queda fuera del alcance de la herramienta.
+
+---
+
+# Fuente de aleatoriedad
+
+La generación de contraseñas utiliza el módulo `secrets` de Python.
+
+El módulo `secrets` está diseñado para generar números aleatorios criptográficamente fuertes, adecuados para gestionar secretos como contraseñas, tokens de autenticación de cuentas y valores similares.
+
+`carnada` no utiliza el módulo `random` de Python para generar contraseñas.
+
+El módulo `random` no es adecuado para uso criptográfico porque su salida no está diseñada para ser impredecible frente a atacantes.
+
+---
+
+# Diseño del conjunto de caracteres
+
+`carnada` soporta grupos de caracteres configurables:
 
 ```text
-uppercase letters;
-lowercase letters;
-numbers;
-symbols.
+letras mayúsculas;
+letras minúsculas;
+números;
+símbolos.
 ```
 
-The tool can avoid visually ambiguous characters by default.
+La herramienta puede evitar caracteres visualmente ambiguos por defecto.
 
-Examples of ambiguous characters:
+Ejemplos de caracteres ambiguos:
 
 ```text
 O
@@ -117,187 +117,187 @@ l
 o
 ```
 
-Removing these characters can make generated passwords easier to read, copy, or type manually, especially when used across terminals, mobile devices, network equipment, or legacy interfaces.
+Eliminar estos caracteres puede facilitar la lectura, copia o escritura manual de contraseñas, especialmente cuando se usan en terminales, dispositivos móviles, equipos de red o interfaces heredadas.
 
-This is a usability decision. It does not replace proper password length or secure storage.
+Esta es una decisión de usabilidad. No reemplaza una longitud adecuada de contraseña ni un almacenamiento seguro.
 
 ---
 
-# Password Composition
+# Composición de contraseñas
 
-When generating a password, `carnada` should guarantee that at least one character from each active character group is included.
+Al generar una contraseña, `carnada` debe garantizar que se incluya al menos un carácter de cada grupo activo.
 
-For example, if uppercase, lowercase, numbers, and symbols are enabled, the generated password should contain at least:
+Por ejemplo, si están habilitados mayúsculas, minúsculas, números y símbolos, la contraseña generada debe contener al menos:
 
 ```text
-one uppercase character;
-one lowercase character;
-one number;
-one symbol.
+un carácter en mayúscula;
+un carácter en minúscula;
+un número;
+un símbolo.
 ```
 
-The remaining characters are selected randomly from the full active character set.
+Los caracteres restantes se seleccionan aleatoriamente desde el conjunto completo de caracteres activo.
 
-The final password is shuffled before being printed.
+La contraseña final se mezcla antes de imprimirse.
 
-This prevents cases where a generated password accidentally misses a selected character group.
+Esto evita casos donde una contraseña generada accidentalmente no incluya un grupo de caracteres seleccionado.
 
 ---
 
-# Entropy Estimation
+# Estimación de entropía
 
-`carnada` estimates entropy using the password length and the size of the active character set.
+`carnada` estima la entropía usando la longitud de la contraseña y el tamaño del conjunto de caracteres activo.
 
-Conceptually:
+Conceptualmente:
 
 ```text
 entropy = password_length × log2(character_set_size)
 ```
 
-The result is shown in bits.
+El resultado se muestra en bits.
 
-This is only an approximation.
+Esta es solo una aproximación.
 
-Entropy estimation is useful for comparing generated passwords, but it does not guarantee real-world security.
+La estimación de entropía es útil para comparar contraseñas generadas, pero no garantiza seguridad en condiciones reales.
 
-Real-world password security also depends on:
+La seguridad real de una contraseña también depende de:
 
 ```text
-whether the password is reused;
-where it is stored;
-how it is transmitted;
-whether it appears in logs;
-whether it is exposed through clipboard history;
-whether the target service has rate limiting;
-whether multi-factor authentication is enabled;
-whether the password has appeared in breaches.
+si la contraseña se reutiliza;
+dónde se almacena;
+cómo se transmite;
+si aparece en logs;
+si queda expuesta mediante historial del portapapeles;
+si el servicio objetivo tiene rate limiting;
+si la autenticación multifactor está habilitada;
+si la contraseña apareció en filtraciones.
 ```
 
 ---
 
-# Strength Rating
+# Clasificación de fortaleza
 
-`carnada` may classify passwords using approximate entropy thresholds.
+`carnada` puede clasificar contraseñas usando umbrales aproximados de entropía.
 
-Example model:
+Modelo de ejemplo:
 
 ```text
-less than 40 bits      weak
-40 to 69 bits          moderate
-70 to 99 bits          strong
-100 bits or more       very strong
+menos de 40 bits      weak
+40 a 69 bits          moderate
+70 a 99 bits          strong
+100 bits o más        very strong
 ```
 
-This rating is a simplified guide, not a formal security assessment.
+Esta clasificación es una guía simplificada, no una evaluación formal de seguridad.
 
-A password rated as `very strong` can still be unsafe if it is reused, logged, stored insecurely, or shared through insecure channels.
+Una contraseña clasificada como `very strong` puede seguir siendo insegura si se reutiliza, se registra en logs, se almacena de forma insegura o se comparte mediante canales inseguros.
 
 ---
 
-# Command-Line History Risk
+# Riesgo del historial de línea de comandos
 
-Users should be careful when passing sensitive passwords directly as command-line arguments.
+Los usuarios deben tener cuidado al pasar contraseñas sensibles directamente como argumentos de línea de comandos.
 
-For example:
+Por ejemplo:
 
 ```bash
 python3 carnada.py check "MySensitivePassword"
 ```
 
-This may expose the password through shell history or process inspection depending on the operating system and shell behavior.
+Esto puede exponer la contraseña mediante el historial de la shell o inspección de procesos, dependiendo del sistema operativo y del comportamiento de la shell.
 
-Recommended usage:
+Uso recomendado:
 
 ```bash
 python3 carnada.py check
 ```
 
-When no password is provided as an argument, the tool should request it using hidden input.
+Cuando no se proporciona una contraseña como argumento, la herramienta debe solicitarla usando entrada oculta.
 
 ---
 
-# Terminal Output Risk
+# Riesgo de salida en terminal
 
-Generated passwords are printed to the terminal.
+Las contraseñas generadas se imprimen en la terminal.
 
-This is expected behavior for a CLI generator, but users should be aware that terminal output may be visible through:
+Este es el comportamiento esperado para un generador CLI, pero los usuarios deben considerar que la salida de terminal puede ser visible mediante:
 
 ```text
-screen recording;
-terminal scrollback;
-shared sessions;
-remote shells;
-copy/paste buffers;
-logs from terminal multiplexers;
-command recording tools.
+grabación de pantalla;
+scrollback de terminal;
+sesiones compartidas;
+shells remotas;
+buffers de copiar/pegar;
+logs de multiplexores de terminal;
+herramientas de grabación de comandos.
 ```
 
-Users should clear terminal history or scrollback when needed and avoid generating sensitive credentials in untrusted environments.
+Los usuarios deben limpiar el historial o scrollback de la terminal cuando sea necesario y evitar generar credenciales sensibles en entornos no confiables.
 
 ---
 
-# JSON Output Considerations
+# Consideraciones sobre salida JSON
 
-JSON output is useful for automation.
+La salida JSON es útil para automatización.
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py --json
 ```
 
-However, users should avoid redirecting JSON output containing passwords into files unless they understand the risk.
+Sin embargo, los usuarios deben evitar redirigir salidas JSON que contienen contraseñas hacia archivos, salvo que entiendan el riesgo.
 
-Example to avoid with real credentials:
+Ejemplo a evitar con credenciales reales:
 
 ```bash
 python3 carnada.py --json > password.json
 ```
 
-This creates a file containing the generated password in plaintext.
+Esto crea un archivo que contiene la contraseña generada en texto claro.
 
-If output redirection is required, the user is responsible for protecting the resulting file.
+Si se requiere redirección de salida, el usuario es responsable de proteger el archivo resultante.
 
 ---
 
-# Quiet Mode Considerations
+# Consideraciones sobre modo silencioso
 
-Quiet mode prints only the generated password.
+El modo silencioso imprime únicamente la contraseña generada.
 
-Example:
+Ejemplo:
 
 ```bash
 python3 carnada.py --quiet
 ```
 
-This is useful for shell scripting, but it can also increase the chance of accidental exposure if the output is piped, logged, redirected, or captured.
+Esto es útil para shell scripting, pero también puede aumentar la probabilidad de exposición accidental si la salida se canaliza, registra, redirige o captura.
 
-Example:
+Ejemplo:
 
 ```bash
 PASSWORD=$(python3 carnada.py --quiet)
 ```
 
-This may leave the password in shell memory or script logs depending on how the variable is used.
+Esto puede dejar la contraseña en memoria de la shell o en logs de scripts, dependiendo de cómo se utilice la variable.
 
-Quiet mode should be used carefully in scripts.
+El modo silencioso debe usarse con cuidado en scripts.
 
 ---
 
-# Dependency Model
+# Modelo de dependencias
 
-`carnada` uses only the Python standard library.
+`carnada` utiliza únicamente la biblioteca estándar de Python.
 
-This reduces:
+Esto reduce:
 
 ```text
-dependency management overhead;
-installation friction;
-third-party supply chain risk;
-package version conflicts.
+sobrecarga de gestión de dependencias;
+fricción de instalación;
+riesgo de supply chain de terceros;
+conflictos de versiones de paquetes.
 ```
 
-The relevant standard modules include:
+Los módulos estándar relevantes incluyen:
 
 ```text
 argparse
@@ -310,30 +310,30 @@ dataclasses
 getpass
 ```
 
-No external Python packages are required.
+No se requieren paquetes externos de Python.
 
 ---
 
-# File System Behavior
+# Comportamiento del sistema de archivos
 
-`carnada` does not create password files by default.
+`carnada` no crea archivos de contraseñas por defecto.
 
-It does not create:
+No crea:
 
 ```text
-password databases;
-encrypted vaults;
-logs containing secrets;
-configuration files containing secrets.
+bases de datos de contraseñas;
+bóvedas cifradas;
+logs que contengan secretos;
+archivos de configuración que contengan secretos.
 ```
 
-If a user redirects output to a file, that behavior is controlled by the shell, not by `carnada`.
+Si el usuario redirige la salida hacia un archivo, ese comportamiento es controlado por la shell, no por `carnada`.
 
 ---
 
-# Recommended Usage
+# Uso recomendado
 
-Recommended:
+Recomendado:
 
 ```bash
 python3 carnada.py
@@ -344,15 +344,15 @@ python3 carnada.py --quiet
 python3 carnada.py check
 ```
 
-Use `check` mode without passing real sensitive passwords directly as command-line arguments.
+Usar el modo `check` sin pasar contraseñas reales sensibles directamente como argumentos de línea de comandos.
 
-Recommended:
+Recomendado:
 
 ```bash
 python3 carnada.py check
 ```
 
-Less recommended for sensitive real passwords:
+Menos recomendado para contraseñas reales sensibles:
 
 ```bash
 python3 carnada.py check "MySensitivePassword"
@@ -360,43 +360,43 @@ python3 carnada.py check "MySensitivePassword"
 
 ---
 
-# Out of Scope
+# Fuera de alcance
 
-The following features are intentionally outside the scope of `carnada`:
+Las siguientes funcionalidades están intencionalmente fuera del alcance de `carnada`:
 
 ```text
-password vaults;
-credential storage;
-secret synchronization;
-cloud backup;
-password recovery;
-password sharing;
-file encryption;
-password hashing for authentication systems;
-breach database checks;
-enterprise password policy enforcement.
+bóvedas de contraseñas;
+almacenamiento de credenciales;
+sincronización de secretos;
+backup en la nube;
+recuperación de contraseñas;
+compartición de contraseñas;
+cifrado de archivos;
+password hashing para sistemas de autenticación;
+revisión contra bases de datos de filtraciones;
+cumplimiento de políticas empresariales de contraseñas.
 ```
 
-These features require broader security controls and should be handled by specialized tools.
+Estas funcionalidades requieren controles de seguridad más amplios y deben ser manejadas por herramientas especializadas.
 
 ---
 
-# Safe Development Practices
+# Prácticas seguras de desarrollo
 
-When maintaining this project:
+Al mantener este proyecto:
 
 ```text
-do not commit generated passwords;
-do not commit local virtual environments;
-do not commit temporary output files;
-do not add network calls unless the security model is updated;
-do not add storage features without a clear threat model;
-do not log passwords;
-do not print hidden input values;
-avoid unnecessary dependencies.
+no hacer commit de contraseñas generadas;
+no hacer commit de entornos virtuales locales;
+no hacer commit de archivos temporales de salida;
+no agregar llamadas de red salvo que el modelo de seguridad sea actualizado;
+no agregar funciones de almacenamiento sin un threat model claro;
+no registrar contraseñas en logs;
+no imprimir valores ingresados mediante entrada oculta;
+evitar dependencias innecesarias.
 ```
 
-Recommended `.gitignore` entries:
+Entradas recomendadas para `.gitignore`:
 
 ```gitignore
 .venv/
@@ -412,10 +412,10 @@ contrasenas_generadas.txt
 
 ---
 
-# Summary
+# Resumen
 
-`carnada` keeps its security posture simple by avoiding storage, networking, encryption layers, and unnecessary dependencies.
+`carnada` mantiene una postura de seguridad simple al evitar almacenamiento, comunicación de red, capas de cifrado y dependencias innecesarias.
 
-Its main purpose is to generate and check passwords locally, provide useful metadata, and return clean terminal output.
+Su propósito principal es generar y revisar contraseñas localmente, proporcionar metadatos útiles y devolver una salida limpia en terminal.
 
-The safest way to use `carnada` is as a temporary local helper, not as a password manager or long-term secret storage system.
+La forma más segura de usar `carnada` es como una herramienta auxiliar local y temporal, no como gestor de contraseñas ni como sistema de almacenamiento de secretos a largo plazo.
