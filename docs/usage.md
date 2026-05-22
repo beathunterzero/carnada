@@ -1,40 +1,40 @@
 # CARNADA Usage Guide
 
-`carnada` es una herramienta local-first de línea de comandos para generar contraseñas seguras y revisar contraseñas existentes desde la terminal.
+`carnada` is a local-first command-line tool for generating secure passwords and checking existing passwords from the terminal.
 
-Esta guía explica los principales modos de uso, perfiles disponibles, opciones de comandos y ejemplos prácticos.
+This guide explains the main usage modes, available profiles, command options, and practical examples.
 
 ---
 
-# Requisitos
+# Requirements
 
-`carnada` requiere:
+`carnada` requires:
 
 ```text
-Python 3.10 o superior
-````
+Python 3.10 or higher
+```
 
-No requiere dependencias externas.
+No external dependencies are required.
 
-La herramienta utiliza únicamente la biblioteca estándar de Python.
+The tool uses only the Python standard library.
 
 ---
 
-# Ejecutar la herramienta
+# Running the Tool
 
-Desde el directorio del proyecto, ejecutar:
+From the project directory, run:
 
 ```bash
 python3 carnada.py
 ```
 
-En Windows PowerShell:
+On Windows PowerShell:
 
 ```powershell
 python carnada.py
 ```
 
-En Linux, WSL o macOS, opcionalmente se puede asignar permiso de ejecución al script:
+On Linux, WSL, or macOS, you can optionally make the script executable:
 
 ```bash
 chmod +x carnada.py
@@ -43,15 +43,15 @@ chmod +x carnada.py
 
 ---
 
-# Generación básica de contraseñas
+# Basic Password Generation
 
-Generar una contraseña segura usando el perfil por defecto:
+Generate one secure password using the default profile:
 
 ```bash
 python3 carnada.py
 ```
 
-Ejemplo de salida:
+Example output:
 
 ```text
 CARNADA — Secure Password Generator
@@ -64,25 +64,25 @@ Entropy  : ~114.44 bits
 Rating   : very strong
 ```
 
-Por defecto, `carnada` utiliza el perfil `strong`.
+By default, `carnada` uses the `strong` profile.
 
 ---
 
-# Longitud personalizada de contraseña
+# Custom Password Length
 
-Usar `-l` o `--length` para definir una longitud personalizada.
+Use `-l` or `--length` to define a custom length.
 
 ```bash
 python3 carnada.py -l 24
 ```
 
-Comando equivalente:
+Equivalent command:
 
 ```bash
 python3 carnada.py --length 24
 ```
 
-Ejemplo de salida:
+Example output:
 
 ```text
 CARNADA — Secure Password Generator
@@ -97,17 +97,17 @@ Rating   : very strong
 
 ---
 
-# Perfiles de generación
+# Generation Profiles
 
-Los perfiles proporcionan configuraciones predefinidas para diferentes escenarios de uso.
+Profiles provide predefined settings for different usage scenarios.
 
-Usar un perfil con:
+Use a profile with:
 
 ```bash
 python3 carnada.py --profile <profile_name>
 ```
 
-Perfiles disponibles:
+Available profiles:
 
 ```text
 strong
@@ -121,18 +121,18 @@ wifi
 
 ## strong
 
-Perfil por defecto para uso general.
+Default profile for general use.
 
-Utiliza:
+Uses:
 
 ```text
-letras mayúsculas
-letras minúsculas
-números
-símbolos
+uppercase letters
+lowercase letters
+numbers
+symbols
 ```
 
-Ejemplo:
+Example:
 
 ```bash
 python3 carnada.py --profile strong
@@ -142,45 +142,45 @@ python3 carnada.py --profile strong
 
 ## legacy
 
-Perfil compatible con sistemas restrictivos o antiguos.
+Compatible profile for restrictive or older systems.
 
-Utiliza:
+Uses:
 
 ```text
-letras mayúsculas
-letras minúsculas
-números
+uppercase letters
+lowercase letters
+numbers
 ```
 
-No utiliza símbolos.
+Does not use symbols.
 
-Ejemplo:
+Example:
 
 ```bash
 python3 carnada.py --profile legacy
 ```
 
-Este perfil es útil cuando un sistema rechaza caracteres especiales o tiene restricciones antiguas de política de contraseñas.
+This profile is useful when a system rejects special characters or has older password policy restrictions.
 
 ---
 
 ## pin
 
-Perfil numérico.
+Numeric profile.
 
-Utiliza:
+Uses:
 
 ```text
-solo números
+numbers only
 ```
 
-Ejemplo:
+Example:
 
 ```bash
 python3 carnada.py --profile pin
 ```
 
-También se puede definir una longitud personalizada para el PIN:
+You can also define a custom PIN length:
 
 ```bash
 python3 carnada.py --profile pin -l 8
@@ -190,61 +190,61 @@ python3 carnada.py --profile pin -l 8
 
 ## hex
 
-Perfil de token hexadecimal.
+Hexadecimal token profile.
 
-Utiliza:
+Uses:
 
 ```text
 0123456789abcdef
 ```
 
-Ejemplo:
+Example:
 
 ```bash
 python3 carnada.py --profile hex
 ```
 
-Este perfil es útil para laboratorios, pruebas técnicas o flujos de trabajo que requieren valores hexadecimales.
+This profile is useful for labs, technical testing, or workflows that require hexadecimal values.
 
 ---
 
 ## wifi
 
-Perfil para contraseñas Wi-Fi largas y compatibles.
+Long and compatible Wi-Fi password profile.
 
-Utiliza:
+Uses:
 
 ```text
-letras mayúsculas
-letras minúsculas
-números
+uppercase letters
+lowercase letters
+numbers
 ```
 
-Ejemplo:
+Example:
 
 ```bash
 python3 carnada.py --profile wifi
 ```
 
-Este perfil evita símbolos complejos para facilitar la escritura manual en teléfonos, routers, televisores inteligentes, consolas y dispositivos IoT.
+This profile avoids complex symbols to make manual typing easier on phones, routers, smart TVs, consoles, and IoT devices.
 
 ---
 
-# Generar múltiples contraseñas
+# Generate Multiple Passwords
 
-Usar `-c` o `--count` para generar más de una contraseña.
+Use `-c` or `--count` to generate more than one password.
 
 ```bash
 python3 carnada.py --count 5
 ```
 
-Comando equivalente:
+Equivalent command:
 
 ```bash
 python3 carnada.py -c 5
 ```
 
-Ejemplo de salida:
+Example output:
 
 ```text
 CARNADA — Secure Password Generator
@@ -262,53 +262,53 @@ Rating   : very strong
 5. Z9!vMc61@HsT3qRb
 ```
 
-Esto es útil cuando se necesitan varias credenciales temporales o se desea elegir entre múltiples opciones generadas.
+This is useful when you need several temporary credentials or want to choose from multiple generated options.
 
 ---
 
-# Modo silencioso
+# Quiet Mode
 
-El modo silencioso imprime únicamente la contraseña generada.
+Quiet mode prints only the generated password.
 
-Uso:
+Use:
 
 ```bash
 python3 carnada.py --quiet
 ```
 
-Comando equivalente:
+Equivalent command:
 
 ```bash
 python3 carnada.py -q
 ```
 
-Ejemplo de salida:
+Example output:
 
 ```text
 V7#kQm92@tLx8pRz
 ```
 
-El modo silencioso es útil para shell scripting.
+Quiet mode is useful for shell scripting.
 
-Ejemplo:
+Example:
 
 ```bash
 PASSWORD=$(python3 carnada.py --quiet)
 ```
 
-Usar esto con cuidado. Las contraseñas almacenadas en variables de shell aún pueden quedar expuestas mediante logs, salida de depuración o comandos posteriores.
+Use this carefully. Passwords stored in shell variables may still be exposed through logs, debugging output, or later commands.
 
 ---
 
-# Salida JSON
+# JSON Output
 
-Usar `--json` para imprimir salida estructurada.
+Use `--json` to print structured output.
 
 ```bash
 python3 carnada.py --json
 ```
 
-Ejemplo de salida:
+Example output:
 
 ```json
 {
@@ -324,25 +324,25 @@ Ejemplo de salida:
 }
 ```
 
-La salida JSON es útil para automatización o integración con otras herramientas.
+JSON output is useful for automation or integration with other tools.
 
-Evitar redirigir contraseñas reales hacia archivos, salvo que se entienda el riesgo.
+Avoid redirecting real passwords into files unless you understand the risk.
 
-Ejemplo a evitar con credenciales sensibles:
+Example to avoid with sensitive credentials:
 
 ```bash
 python3 carnada.py --json > password.json
 ```
 
-Esto crea un archivo en texto plano que contiene la contraseña generada.
+This creates a plaintext file containing the generated password.
 
 ---
 
-# Opciones de grupos de caracteres
+# Character Group Options
 
-`carnada` permite deshabilitar grupos específicos de caracteres.
+`carnada` allows disabling specific character groups.
 
-Opciones disponibles:
+Available options:
 
 ```text
 --no-upper
@@ -351,35 +351,35 @@ Opciones disponibles:
 --no-symbols
 ```
 
-Ejemplos:
+Examples:
 
-Generar una contraseña sin símbolos:
+Generate a password without symbols:
 
 ```bash
 python3 carnada.py --no-symbols
 ```
 
-Generar una contraseña solo con letras minúsculas y números:
+Generate a password with only lowercase letters and numbers:
 
 ```bash
 python3 carnada.py --no-upper --no-symbols
 ```
 
-Generar una contraseña sin números:
+Generate a password without numbers:
 
 ```bash
 python3 carnada.py --no-numbers
 ```
 
-Debe permanecer habilitado al menos un grupo de caracteres.
+At least one character group must remain enabled.
 
 ---
 
-# Caracteres ambiguos
+# Ambiguous Characters
 
-Por defecto, `carnada` evita caracteres visualmente ambiguos.
+By default, `carnada` avoids visually ambiguous characters.
 
-Ejemplos:
+Examples:
 
 ```text
 O
@@ -390,39 +390,39 @@ l
 o
 ```
 
-Esto facilita la lectura y escritura manual de contraseñas.
+This makes generated passwords easier to read and type manually.
 
-Para permitir caracteres ambiguos, usar:
+To allow ambiguous characters, use:
 
 ```bash
 python3 carnada.py --allow-ambiguous
 ```
 
-Esto puede aumentar ligeramente el conjunto de caracteres disponible.
+This may slightly increase the available character set.
 
 ---
 
-# Modo de revisión de contraseña
+# Password Check Mode
 
-`carnada` puede revisar una contraseña existente de forma local.
+`carnada` can check an existing password locally.
 
-Uso:
+Use:
 
 ```bash
 python3 carnada.py check
 ```
 
-La herramienta solicitará la contraseña usando entrada oculta.
+The tool will ask for the password using hidden input.
 
-Ejemplo:
+Example:
 
 ```text
 Password to check:
 ```
 
-Este es el método recomendado porque la contraseña no se pasa directamente por la línea de comandos de la shell.
+This is the recommended method because the password is not passed directly through the shell command.
 
-Ejemplo de salida:
+Example output:
 
 ```text
 CARNADA — Password Check
@@ -439,29 +439,29 @@ Rating          : strong
 
 ---
 
-# Revisar una contraseña desde la línea de comandos
+# Checking a Password from the Command Line
 
-También se puede proporcionar la contraseña directamente como argumento:
+You can also provide the password directly as an argument:
 
 ```bash
 python3 carnada.py check "Password123!"
 ```
 
-Esto es menos recomendable para contraseñas reales sensibles porque puede almacenarse en el historial de la shell o quedar visible mediante inspección de procesos.
+This is less recommended for real sensitive passwords because it may be stored in shell history or visible through process inspection.
 
-Usar esta forma principalmente para pruebas, ejemplos o valores no sensibles.
+Use this form mainly for testing, examples, or non-sensitive values.
 
 ---
 
-# Salida JSON en modo check
+# JSON Output in Check Mode
 
-Usar `--json` con el modo `check`:
+Use `--json` with `check` mode:
 
 ```bash
 python3 carnada.py check --json
 ```
 
-Ejemplo de salida:
+Example output:
 
 ```json
 {
@@ -476,7 +476,7 @@ Ejemplo de salida:
 }
 ```
 
-También se puede revisar un valor proporcionado directamente:
+You can also check a provided value:
 
 ```bash
 python3 carnada.py check "Password123!" --json
@@ -484,21 +484,21 @@ python3 carnada.py check "Password123!" --json
 
 ---
 
-# Menú de ayuda
+# Help Menu
 
-Para mostrar el menú principal de ayuda:
+To display the main help menu:
 
 ```bash
 python3 carnada.py --help
 ```
 
-Para mostrar ayuda del modo generate:
+To display help for generate mode:
 
 ```bash
 python3 carnada.py generate --help
 ```
 
-Para mostrar ayuda del modo check:
+To display help for check mode:
 
 ```bash
 python3 carnada.py check --help
@@ -506,15 +506,15 @@ python3 carnada.py check --help
 
 ---
 
-# Versión
+# Version
 
-Para mostrar la versión de la herramienta:
+To display the tool version:
 
 ```bash
 python3 carnada.py --version
 ```
 
-Ejemplo de salida:
+Example output:
 
 ```text
 carnada 1.0.0
@@ -522,57 +522,57 @@ carnada 1.0.0
 
 ---
 
-# Patrones comunes de uso
+# Common Usage Patterns
 
-Generar una contraseña fuerte:
+Generate a strong password:
 
 ```bash
 python3 carnada.py
 ```
 
-Generar una contraseña más larga:
+Generate a longer password:
 
 ```bash
 python3 carnada.py -l 32
 ```
 
-Generar una contraseña para un sistema restrictivo:
+Generate a password for a restrictive system:
 
 ```bash
 python3 carnada.py --profile legacy
 ```
 
-Generar una contraseña compatible para Wi-Fi:
+Generate a Wi-Fi-friendly password:
 
 ```bash
 python3 carnada.py --profile wifi
 ```
 
-Generar un PIN numérico:
+Generate a numeric PIN:
 
 ```bash
 python3 carnada.py --profile pin -l 6
 ```
 
-Generar un token hexadecimal:
+Generate a hexadecimal token:
 
 ```bash
 python3 carnada.py --profile hex
 ```
 
-Generar múltiples candidatos:
+Generate multiple candidates:
 
 ```bash
 python3 carnada.py --count 10
 ```
 
-Usar la salida en una variable de shell:
+Use output in a shell variable:
 
 ```bash
 PASSWORD=$(python3 carnada.py --quiet)
 ```
 
-Revisar una contraseña de forma segura usando entrada oculta:
+Check a password safely using hidden input:
 
 ```bash
 python3 carnada.py check
@@ -580,67 +580,67 @@ python3 carnada.py check
 
 ---
 
-# Prácticas recomendadas
+# Recommended Practices
 
-Usar el perfil `strong` por defecto para contraseñas generales.
+Use the default `strong` profile for general passwords.
 
-Usar `legacy` solo cuando un sistema rechace símbolos.
+Use `legacy` only when a system rejects symbols.
 
-Usar `wifi` cuando la contraseña deba escribirse manualmente en varios dispositivos.
+Use `wifi` when the password must be typed manually on multiple devices.
 
-Usar el modo `check` sin pasar contraseñas reales sensibles directamente como argumentos de línea de comandos.
+Use `check` mode without passing real sensitive passwords directly as command-line arguments.
 
-Usar `--quiet` con cuidado en scripts.
+Use `--quiet` carefully in scripts.
 
-Evitar redirigir contraseñas generadas hacia archivos en texto plano.
+Avoid redirecting generated passwords into plaintext files.
 
-Almacenar credenciales de largo plazo en un gestor de contraseñas dedicado.
-
----
-
-# Comportamiento de salida
-
-`carnada` se ejecuta, imprime la salida solicitada y finaliza.
-
-No mantiene procesos en segundo plano.
-
-No almacena contraseñas generadas.
-
-No crea logs.
-
-No requiere acceso a internet.
+Store long-term credentials in a dedicated password manager.
 
 ---
 
-# Solución de problemas
+# Exit Behavior
 
-## Comando Python no encontrado
+`carnada` runs, prints the requested output, and exits.
 
-Probar con:
+It does not keep a background process running.
+
+It does not store generated passwords.
+
+It does not create logs.
+
+It does not require internet access.
+
+---
+
+# Troubleshooting
+
+## Python command not found
+
+Try:
 
 ```bash
 python carnada.py
 ```
 
-o:
+or:
 
 ```bash
 python3 carnada.py
 ```
 
-dependiendo del sistema operativo y de la instalación de Python.
+depending on your operating system and Python installation.
 
 ---
 
-## Permiso denegado al ejecutar `./carnada.py`
+## Permission denied when running `./carnada.py`
 
-Dar permisos de ejecución al script:
+Give the script execution permissions:
 
 ```bash
 chmod +x carnada.py
 ```
 
-Luego ejecutar:
+Then run:
 
 ```bash
 ./carnada.py
@@ -648,9 +648,9 @@ Luego ejecutar:
 
 ---
 
-## Perfil inválido
+## Invalid profile
 
-Usar uno de los perfiles disponibles:
+Use one of the available profiles:
 
 ```text
 strong
@@ -660,7 +660,7 @@ hex
 wifi
 ```
 
-Ejemplo:
+Example:
 
 ```bash
 python3 carnada.py --profile strong
@@ -668,28 +668,28 @@ python3 carnada.py --profile strong
 
 ---
 
-## Sin grupos de caracteres habilitados
+## No character groups enabled
 
-Esto puede ocurrir si todos los grupos de caracteres están deshabilitados:
+This can happen if all character groups are disabled:
 
 ```bash
 python3 carnada.py --no-upper --no-lower --no-numbers --no-symbols
 ```
 
-Debe permanecer habilitado al menos un grupo de caracteres.
+At least one character group must remain enabled.
 
 ---
 
-# Resumen
+# Summary
 
-`carnada` proporciona un flujo local simple:
+`carnada` provides a simple local workflow:
 
 ```text
-generar contraseñas;
-revisar contraseñas;
-estimar entropía;
-imprimir una salida limpia en terminal;
-evitar almacenar secretos.
+generate passwords;
+check passwords;
+estimate entropy;
+print clean terminal output;
+avoid storing secrets.
 ```
 
-Está diseñada para ser pequeña, práctica y segura para uso local desde terminal.
+It is designed to be small, practical, and safe for local terminal use.
