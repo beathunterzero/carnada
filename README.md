@@ -5,195 +5,200 @@
 
 ---
 
-`carnada` es una herramienta CLI local para generar contraseñas seguras y revisar contraseñas existentes desde la terminal.
+`carnada` is a local CLI tool for generating secure passwords and checking existing passwords from the terminal.
 
-El proyecto sigue un principio simple: generar credenciales fuertes sin almacenar secretos, sin enviar datos a internet y sin agregar funcionalidades innecesarias que aumenten el riesgo operativo.
-
----
-
-# Descripción
-
-`carnada` genera contraseñas aleatorias utilizando mecanismos criptográficamente seguros proporcionados por Python. También incluye un modo de análisis local de contraseñas para revisar características básicas como longitud, letras mayúsculas, letras minúsculas, números, símbolos, caracteres ambiguos y entropía aproximada.
-
-La herramienta está diseñada para uso local, laboratorios de ciberseguridad, generación temporal de credenciales, pruebas técnicas y flujos de trabajo desde la shell.
+The project follows a simple principle: generate strong credentials without storing secrets, sending data to the internet, or adding unnecessary features that increase operational risk.
 
 ---
 
-# Objetivo del proyecto
+# Description
 
-`carnada` no está diseñada para reemplazar un gestor de contraseñas.
+`carnada` generates random passwords using cryptographically secure mechanisms provided by Python. It also includes a local password analysis mode to inspect basic characteristics such as length, uppercase letters, lowercase letters, numbers, symbols, ambiguous characters, and approximate entropy.
 
-Su propósito es proporcionar una herramienta pequeña, auditable y fácil de usar para:
-
-- generar contraseñas seguras desde la terminal;
-
-- crear contraseñas compatibles con diferentes entornos;
-
-- revisar contraseñas de forma local;
-
-- integrarse con scripts mediante salida limpia o JSON;
-
-- mantener una superficie de riesgo operativo reducida.
+The tool is designed for local usage, cybersecurity labs, temporary credential generation, technical testing, and shell-based workflows.
 
 ---
 
-# Funcionalidades principales
+# Project Goal
 
-- Generación segura de contraseñas utilizando aleatoriedad criptográficamente segura.
+`carnada` is not intended to replace a password manager.
 
-- Perfiles de generación para diferentes casos de uso.
+Its purpose is to provide a small, auditable, and easy-to-use tool to:
 
-- Estimación aproximada de entropía en bits.
-
-- Revisión local de contraseñas.
-
-- Generación de múltiples contraseñas en una sola ejecución.
-
-- Modo silencioso para scripting.
-
-- Salida JSON para automatización.
-
-- Sin almacenamiento de contraseñas.
-
-- Sin conexión a internet requerida.
-
-- Sin bóveda de cifrado, gestión de secretos ni sincronización remota.
+- generate secure passwords from the terminal;
+    
+- create passwords compatible with different environments;
+    
+- check passwords locally;
+    
+- integrate with scripts using clean or JSON output;
+    
+- keep the operational risk surface small.
+    
 
 ---
 
-# ¿Qué hace?
+# Main Features
 
-`carnada` puede:
-
-- generar una contraseña segura usando la configuración por defecto;
-
-- generar contraseñas con una longitud personalizada;
-
-- generar múltiples contraseñas;
-
-- usar perfiles como `strong`, `legacy`, `pin`, `hex` y `wifi`;
-
-- mostrar una estimación aproximada de entropía;
-
-- clasificar la fortaleza aproximada de una contraseña;
-
-- revisar una contraseña ingresada por el usuario;
-
-- devolver salida normal, silenciosa o en formato JSON.
-
----
-
-# ¿Qué no hace?
-
-`carnada` no:
-
-- almacena contraseñas;
-
-- administra bóvedas de contraseñas;
-
-- cifra archivos;
-
-- genera hashes de contraseñas;
-
-- sincroniza secretos;
-
-- envía información a internet;
-
-- reemplaza un gestor de contraseñas;
-
-- garantiza seguridad absoluta.
-
-Esto es intencional. La herramienta está diseñada para hacer pocas cosas de forma clara, local y auditable.
+- Secure password generation using cryptographically secure randomness.
+    
+- Generation profiles for different use cases.
+    
+- Approximate entropy estimation in bits.
+    
+- Local password checking.
+    
+- Multiple password generation in a single execution.
+    
+- Quiet mode for scripting.
+    
+- JSON output for automation.
+    
+- No password storage.
+    
+- No internet connection required.
+    
+- No encryption vault, secret management, or remote synchronization.
+    
 
 ---
 
-# Requisitos
+# What It Does
 
-- Python 3.10 o superior.
+`carnada` can:
 
-- No requiere dependencias externas.
-
-- Utiliza únicamente la biblioteca estándar de Python.
+- generate a secure password using the default configuration;
+    
+- generate passwords with a custom length;
+    
+- generate multiple passwords;
+    
+- use profiles such as `strong`, `legacy`, `pin`, `hex`, and `wifi`;
+    
+- display an approximate entropy estimate;
+    
+- classify the approximate password strength;
+    
+- check a password entered by the user;
+    
+- return normal, quiet, or JSON output.
+    
 
 ---
 
-# Instalación e inicio rápido
+# What It Does Not Do
 
-Clonar el repositorio:
+`carnada` does not:
+
+- store passwords;
+    
+- manage password vaults;
+    
+- encrypt files;
+    
+- generate password hashes;
+    
+- synchronize secrets;
+    
+- send information to the internet;
+    
+- replace a password manager;
+    
+- guarantee absolute security.
+    
+
+This is intentional. The tool is designed to do a few things clearly, locally, and auditably.
+
+---
+
+# Requirements
+
+- Python 3.10 or higher.
+    
+- No external dependencies required.
+    
+- Uses only the Python standard library.
+    
+
+---
+
+# Installation and Quick Start
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/beathunterzero/carnada.git
 cd carnada
-`````
+```
 
-Ejecutar la herramienta:
+Run the tool:
 
 ```bash
 python3 carnada.py
 ```
 
-Ejecución directa opcional en Linux, WSL o macOS:
+Optional direct execution on Linux, WSL, or macOS:
 
 ```bash
 chmod +x carnada.py
 ./carnada.py
 ```
 
-En Windows PowerShell:
+On Windows PowerShell:
 
 ```powershell
 python carnada.py
 ```
 
-Debido a que la herramienta no utiliza dependencias externas, no es necesario instalar paquetes adicionales.
+Because the tool has no external dependencies, no package installation is required.
 
 ---
 
-# Uso básico
+# Basic Usage
 
-Generar una contraseña segura usando la configuración por defecto:
+Generate a secure password using the default configuration:
 
 ```bash
 python3 carnada.py
 ```
 
-Generar una contraseña de 24 caracteres:
+Generate a 24-character password:
 
 ```bash
 python3 carnada.py -l 24
 ```
 
-Generar una contraseña usando el perfil `legacy`:
+Generate a password using the `legacy` profile:
 
 ```bash
 python3 carnada.py --profile legacy
 ```
 
-Generar cinco contraseñas:
+Generate five passwords:
 
 ```bash
 python3 carnada.py --count 5
 ```
 
-Imprimir únicamente la contraseña generada:
+Print only the generated password:
 
 ```bash
 python3 carnada.py --quiet
 ```
 
-Generar salida en formato JSON:
+Generate JSON output:
 
 ```bash
 python3 carnada.py --json
 ```
 
-Revisar una contraseña de forma local:
+Check a password locally:
 
 ```bash
 python3 carnada.py check
 ```
 
-Revisar una contraseña directamente desde la línea de comandos:
+Check a password directly from the command line:
 
 ```bash
 python3 carnada.py check "Password123!"
@@ -201,33 +206,33 @@ python3 carnada.py check "Password123!"
 
 ---
 
-# Perfiles disponibles
+# Available Profiles
 
 ## `strong`
 
-Perfil recomendado para uso general. Utiliza letras mayúsculas, letras minúsculas, números y símbolos. Está diseñado para generar contraseñas fuertes para sistemas modernos.
+Recommended profile for general use. Uses uppercase letters, lowercase letters, numbers, and symbols. Designed to generate strong passwords for modern systems.
 
 ## `legacy`
 
-Perfil compatible con sistemas antiguos o restrictivos. Utiliza letras y números, evitando símbolos complejos.
+Compatible profile for older or restrictive systems. Uses letters and numbers while avoiding complex symbols.
 
 ## `pin`
 
-Perfil numérico. Útil para PINs temporales o códigos numéricos cortos.
+Numeric profile. Useful for short temporary PINs or numeric codes.
 
 ## `hex`
 
-Perfil de token hexadecimal. Útil para pruebas técnicas, laboratorios o flujos de trabajo que requieren salida hexadecimal.
+Hexadecimal token profile. Useful for technical testing, labs, or workflows that require hexadecimal output.
 
 ## `wifi`
 
-Perfil para contraseñas Wi-Fi largas y compatibles. Evita símbolos complejos para facilitar el ingreso manual en dispositivos.
+Profile for long and compatible Wi-Fi passwords. Avoids complex symbols to make manual entry easier on devices.
 
 ---
 
-# Ejemplos de salida
+# Output Examples
 
-Ejemplo de generación normal:
+Normal generation example:
 
 ```text
 CARNADA — Secure Password Generator
@@ -240,13 +245,13 @@ Entropy  : ~114.44 bits
 Rating   : very strong
 ```
 
-Ejemplo de modo silencioso:
+Quiet mode example:
 
 ```text
 V7#kQm92@tLx8pRz
 ```
 
-Ejemplo de revisión de contraseña:
+Password check example:
 
 ```text
 CARNADA — Password Check
@@ -263,43 +268,44 @@ Rating          : strong
 
 ---
 
-# Seguridad y diseño
+# Security and Design
 
-`carnada` sigue un diseño local-first.
+`carnada` follows a local-first design.
 
-Todas las operaciones se realizan localmente en el equipo del usuario. La herramienta no envía contraseñas a servicios externos, no realiza solicitudes remotas y no requiere conexión a internet.
+All operations are performed locally on the user’s machine. The tool does not send passwords to external services, does not perform remote requests, and does not require an internet connection.
 
-La generación de contraseñas utiliza el módulo `secrets` de Python, adecuado para generar valores aleatorios criptográficamente seguros.
+Password generation uses Python’s `secrets` module, which is suitable for generating cryptographically secure random values.
 
-La herramienta evita almacenar secretos por diseño. No crea archivos que contengan contraseñas, no almacena claves maestras y no mantiene historial propio.
-
----
-
-# Sobre la entropía
-
-La entropía mostrada por `carnada` es una estimación aproximada basada en la longitud de la contraseña y el tamaño del conjunto de caracteres utilizado.
-
-Esta métrica proporciona una referencia general sobre la fortaleza de contraseñas generadas aleatoriamente, pero no debe interpretarse como una garantía absoluta de seguridad.
-
-La seguridad real también depende del contexto de uso, la política del sistema, la exposición del secreto, las prácticas de almacenamiento, la reutilización de contraseñas y controles de seguridad adicionales.
+The tool avoids storing secrets by design. It does not create files containing passwords, does not store master keys, and does not maintain its own history.
 
 ---
 
-# Consideraciones importantes
+# About Entropy
 
-* No reutilizar contraseñas entre diferentes servicios.
+The entropy shown by `carnada` is an approximate estimate based on password length and the size of the character set used.
 
-* No pegar contraseñas sensibles en sistemas no confiables.
+This metric provides a general reference for the strength of randomly generated passwords, but it should not be interpreted as an absolute security guarantee.
 
-* No compartir contraseñas mediante canales inseguros.
-
-* Utilizar un gestor de contraseñas para almacenar credenciales permanentes.
-
-* Usar `carnada` como generador local o herramienta de apoyo, no como bóveda de secretos.
+Real-world security also depends on usage context, system policy, secret exposure, storage practices, password reuse, and additional security controls.
 
 ---
 
-# Estructura del proyecto
+# Important Considerations
+
+- Do not reuse passwords across different services.
+    
+- Do not paste sensitive passwords into untrusted systems.
+    
+- Do not share passwords through insecure channels.
+    
+- Use a password manager to store permanent credentials.
+    
+- Use `carnada` as a local generator or support tool, not as a secret vault.
+    
+
+---
+
+# Project Structure
 
 ```text
 CARNADA/
@@ -319,29 +325,29 @@ CARNADA/
 
 ---
 
-# Documentación adicional
+# Additional Documentation
 
-La documentación extendida está disponible en el directorio `docs/`.
+Extended documentation is available in the `docs/` directory.
 
-Guía de uso:
+Usage guide:
 
 ```text
 docs/usage.md
 ```
 
-Notas de seguridad:
+Security notes:
 
 ```text
 docs/security-notes.md
 ```
 
-Descripción de arquitectura:
+Architecture overview:
 
 ```text
 docs/architecture/overview.md
 ```
 
-Ejemplos prácticos:
+Practical examples:
 
 ```text
 examples/usage-examples.md
@@ -349,20 +355,23 @@ examples/usage-examples.md
 
 ---
 
-# Estado del proyecto
+# Project Status
 
-Este proyecto está pensado como una herramienta personal de línea de comandos con enfoque educativo, práctico y defensivo en ciberseguridad.
+This project is intended as a personal command-line tool with an educational, practical, and defensive cybersecurity focus.
 
-La versión inicial mantiene el alcance intencionalmente reducido y evita funcionalidades que incrementarían innecesariamente el riesgo, como almacenamiento de secretos, cifrado de bóvedas o sincronización remota.
-
----
-
-# Licencia
-
-Este proyecto se distribuye bajo la licencia especificada en el archivo `LICENSE`.
+The initial version keeps the scope intentionally small and avoids features that would unnecessarily increase risk, such as secret storage, vault encryption, or remote synchronization.
 
 ---
 
-# Autor
+# License
 
-**beathunterzero**
+This project is distributed under the license specified in the `LICENSE` file.
+
+---
+
+# Author
+
+**beathunterzero**  
+Cyber Threat Hunting & Security
+
+Personal project focused on cybersecurity, automation, and defensive command-line tooling.
