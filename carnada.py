@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-carnada - generador y verificador de contraseñas para la línea de comandos que da prioridad al uso local.
+carnada - Local-first CLI password generator and password checker.
 
 Genera contraseñas seguras usando aleatoriedad criptográfica.
 No guarda secretos, no cifra archivos y no envía datos a internet.
